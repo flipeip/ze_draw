@@ -1,6 +1,6 @@
 # Zé Draw
 
-Comunidade digital criada para motivacionar e inspirar artistas de todo o mundo.
+Comunidade digital criada para motivar e inspirar artistas de todo o mundo.
 
 ## Equipe
 
