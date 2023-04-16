@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../widgets/campo_texto.dart';
 
@@ -11,37 +11,68 @@ class LoginTela extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const alturaImagens = 150.0;
+
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: const [
-              SizedBox(height: 112),
-              Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 64),
-                // TODO: Substituir por logo do projeto
-                child: Placeholder(
-                  fallbackHeight: 100,
-                ),
-              ),
-              CampoTexto(label: 'E-mail ou Usuário'),
-              SizedBox(height: 30),
-              CampoTexto(
-                label: 'Senha',
-                senha: true,
-              ),
-              _EsqueceuSenha(),
-              SizedBox(height: 32),
-              _BotaoEntrar(),
-              _Divisor(),
-              _EntrarComGoogle(),
-              _CriarConta()
-            ],
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: SvgPicture.asset(
+              'assets/images/topo-direita.svg',
+              height: alturaImagens,
+            ),
           ),
-        ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: SvgPicture.asset(
+              'assets/images/topo-esquerda.svg',
+              height: alturaImagens,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: SvgPicture.asset(
+              'assets/images/baixo-direita.svg',
+              height: alturaImagens,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: SvgPicture.asset(
+              'assets/images/baixo-esquerda.svg',
+              height: alturaImagens,
+            ),
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 112),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 64),
+                    child: SvgPicture.asset('assets/images/logo.svg'),
+                  ),
+                  const CampoTexto(label: 'E-mail ou Usuário'),
+                  const SizedBox(height: 30),
+                  const CampoTexto(
+                    label: 'Senha',
+                    senha: true,
+                  ),
+                  const _EsqueceuSenha(),
+                  const SizedBox(height: 32),
+                  const _BotaoEntrar(),
+                  const _Divisor(),
+                  const _EntrarComGoogle(),
+                  const _CriarConta(),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -172,9 +203,9 @@ class _EntrarComGoogle extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(4, 8, 16, 8),
-                  child: Icon(FontAwesomeIcons.google),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset('assets/images/google.png'),
                 ),
                 Text(
                   'Entrar com Google',
