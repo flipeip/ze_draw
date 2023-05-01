@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:ze_draw/tema.dart';
-import 'telas/rotas.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+import 'utilidades/api_config.dart';
+import 'telas/rotas.dart';
+import 'utilidades/tema.dart';
+
+void main() async {
+  await iniciarDependencias();
   runApp(const MainApp());
+}
+
+Future<void> iniciarDependencias() async {
+  await Supabase.initialize(
+    url: apiUrl,
+    anonKey: apiKey,
+  );
 }
 
 class MainApp extends StatelessWidget {
