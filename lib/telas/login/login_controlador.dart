@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:ze_draw/api/autenticacao.dart';
 import 'package:ze_draw/telas/login/login_tela.dart';
 
+import '../rotas.dart';
+
 class LoginControlador extends StatefulWidget {
   final TextEditingController usuario = TextEditingController();
   final TextEditingController senha = TextEditingController();
@@ -13,9 +15,10 @@ class LoginControlador extends StatefulWidget {
   @override
   State<LoginControlador> createState() => _LoginControladorState();
 
-  void logar() async {
+  void logar(BuildContext context) async {
     try {
       await Autenticacao.logar(usuario.text, senha.text);
+      Navigator.of(context).pushNamed(Rotas.feed);
       // TODO: Ir para tela de feed.
     } catch (e) {
       log(e.toString());
