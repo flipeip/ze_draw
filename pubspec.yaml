@@ -12,6 +12,7 @@ dependencies:
   flutter_svg: ^2.0.5
   font_awesome_flutter: ^10.4.0
   simple_gradient_text: ^1.2.4
+  supabase_flutter: ^1.8.1
 
 dev_dependencies:
   flutter_test:

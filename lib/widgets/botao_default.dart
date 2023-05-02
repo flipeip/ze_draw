@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
 class BotaoEntrar extends StatelessWidget {
-  const BotaoEntrar(
-    {required this.texto}
-  );
   final String texto;
+  final void Function() aoClicar;
+
+  const BotaoEntrar({
+    required this.texto,
+    required this.aoClicar,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +42,7 @@ class BotaoEntrar extends StatelessWidget {
         child: InkWell(
           splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.5),
           borderRadius: borderRadius,
-          onTap: () {},
+          onTap: aoClicar,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 24,

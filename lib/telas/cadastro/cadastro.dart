@@ -54,7 +54,7 @@ class CadastroTela extends StatelessWidget {
                   const SizedBox(height: 112),
                   GradientText(
                     'Criar Conta',
-                    colors: [
+                    colors: const [
                       Color(0xFFFF2626),
                       Color(0xFFFFA800),
                       Color(0xFF34D1DB),
@@ -70,7 +70,10 @@ class CadastroTela extends StatelessWidget {
                   const SizedBox(height: 24),
                   const CampoTexto(label: 'Digite a senha novamente'),
                   const SizedBox(height: 24),
-                  const BotaoEntrar(texto: 'Cadastrar-se'),
+                  BotaoEntrar(
+                    texto: 'Cadastrar-se',
+                    aoClicar: () {},
+                  ),
                   const _Divisor(),
                   const EntrarComGoogle(),
                 ],
@@ -80,10 +83,11 @@ class CadastroTela extends StatelessWidget {
           Padding(
             padding: EdgeInsets.all(4),
             child: IconButton(
-              onPressed: Navigator.of(context).pop,
-              icon: Icon(FontAwesomeIcons.arrowLeft,
-              color: Color.fromARGB(255, 63, 133, 107),)
-            ),
+                onPressed: Navigator.of(context).pop,
+                icon: Icon(
+                  FontAwesomeIcons.arrowLeft,
+                  color: Color.fromARGB(255, 63, 133, 107),
+                )),
           )
         ],
       ),
