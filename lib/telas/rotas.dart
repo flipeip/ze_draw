@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'cadastro/cadastro_controlador.dart';
 import 'login/login_controlador.dart';
-import 'cadastro/cadastro.dart';
 import 'feed/feed_inicial.dart';
 
 class Rotas {
@@ -12,8 +12,8 @@ class Rotas {
   static Map<String, Widget Function(BuildContext)> get rotas {
     return {
       login: (_) => LoginControlador(),
-      cadastro: (_) => const CadastroTela(),
-      feed: (_) => FeedTela(),
+      feed: (_) => const FeedTela(),
+      cadastro: (_) => CadastroControlador(),
     };
   }
 }

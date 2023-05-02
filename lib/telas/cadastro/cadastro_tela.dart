@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
-import 'package:ze_draw/widgets/botao_default.dart';
-import 'package:ze_draw/widgets/campo_texto.dart';
 
+import '../../widgets/botao_default.dart';
 import '../../widgets/botao_google.dart';
+import '../../widgets/campo_texto.dart';
+import 'cadastro_controlador.dart';
 
 class CadastroTela extends StatelessWidget {
-  const CadastroTela({super.key});
+  final CadastroControlador controlador;
+
+  const CadastroTela(this.controlador, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,20 +62,32 @@ class CadastroTela extends StatelessWidget {
                       Color(0xFFFFA800),
                       Color(0xFF34D1DB),
                     ],
-                    style: TextStyle(fontSize: 55, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        fontSize: 55, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 32),
-                  const CampoTexto(label: 'Digite um e-mail'),
+                  CampoTexto(
+                    label: 'Digite um e-mail',
+                    controlador: controlador.email,
+                  ),
+                  // const SizedBox(height: 24),
+                  // const CampoTexto(label: 'Digite um usuário'),
                   const SizedBox(height: 24),
-                  const CampoTexto(label: 'Digite um usuário'),
+                  CampoTexto(
+                    label: 'Digite uma senha',
+                    controlador: controlador.senha,
+                    oculto: true,
+                  ),
                   const SizedBox(height: 24),
-                  const CampoTexto(label: 'Digite uma senha'),
-                  const SizedBox(height: 24),
-                  const CampoTexto(label: 'Digite a senha novamente'),
+                  CampoTexto(
+                    label: 'Digite a senha novamente',
+                    controlador: controlador.senhaRepetir,
+                    oculto: true,
+                  ),
                   const SizedBox(height: 24),
                   BotaoEntrar(
                     texto: 'Cadastrar-se',
-                    aoClicar: () {},
+                    aoClicar: () => controlador.criarConta(context),
                   ),
                   const _Divisor(),
                   const EntrarComGoogle(),
