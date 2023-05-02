@@ -17,7 +17,14 @@ class FeedTela extends StatelessWidget {
         elevation: 10,
         surfaceTintColor: Colors.white,
       ),
-      body: Post(),
+      body: SingleChildScrollView(
+          child: Column(
+            children: [
+            Post(),
+            const Divider(color: Color(0XFFF1F1F1),thickness: 10),
+            Post(),
+          ]),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -54,6 +61,20 @@ class FeedTela extends StatelessWidget {
         selectedItemColor: Color(0xFF679C8A),
         type: BottomNavigationBarType.fixed,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){},
+        child: 
+          Container(
+            width: 60,
+            height: 60,
+            child: Icon(FontAwesomeIcons.paintbrush, color: Colors.white,),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(colors: [Color(0XFFFF2626), Color(0XFFFFA800), Color(0XFF34D1DB)]),
+            ),
+          ),
+          shape: CircleBorder(),
+        ),
     );
   }
 }
