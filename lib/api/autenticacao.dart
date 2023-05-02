@@ -1,21 +1,23 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'api.dart';
 
 class Autenticacao {
-  criarConta(String email, String senha) async {
-    await api.auth.signUp(
+  static Future<AuthResponse> criarConta(String email, String senha) {
+    return api.auth.signUp(
       email: email,
       password: senha,
     );
   }
 
-  logar(String email, String senha) {
+  static Future<AuthResponse> logar(String email, String senha) {
     return api.auth.signInWithPassword(
       email: email,
       password: senha,
     );
   }
 
-  get usuario => api.auth.currentUser;
+  static get usuario => api.auth.currentUser;
 
-  get sessao => api.auth.currentSession;
+  static get sessao => api.auth.currentSession;
 }

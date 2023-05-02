@@ -3,13 +3,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CampoTexto extends StatefulWidget {
   final String label;
-  final bool senha;
-  final TextEditingController? controller;
+  final bool oculto;
+  final TextEditingController? controlador;
 
   const CampoTexto({
     required this.label,
-    this.controller,
-    this.senha = false,
+    this.controlador,
+    this.oculto = false,
     super.key,
   });
 
@@ -18,11 +18,17 @@ class CampoTexto extends StatefulWidget {
 }
 
 class _CampoTextoState extends State<CampoTexto> {
-  bool _mostrarSenha = false;
+  bool _ocultarTexto = false;
+
+  @override
+  void initState() {
+    if (widget.oculto) _ocultarTexto = true;
+    super.initState();
+  }
 
   void toggleSenha() {
     setState(() {
-      _mostrarSenha = !_mostrarSenha;
+      _ocultarTexto = !_ocultarTexto;
     });
   }
 
@@ -45,16 +51,16 @@ class _CampoTextoState extends State<CampoTexto> {
         ],
       ),
       child: TextFormField(
-        controller: widget.controller,
-        obscureText: _mostrarSenha,
+        controller: widget.controlador,
+        obscureText: _ocultarTexto,
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: widget.label,
           hintStyle: Theme.of(context).inputDecorationTheme.hintStyle?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
-          suffixIcon: widget.senha
+          suffixIcon: widget.oculto
               ? IconButton(
-                  icon: Icon(_mostrarSenha
+                  icon: Icon(_ocultarTexto
                       ? FontAwesomeIcons.eyeSlash
                       : FontAwesomeIcons.eye),
                   color: Theme.of(context).colorScheme.primary,

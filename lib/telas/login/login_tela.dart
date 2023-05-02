@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ze_draw/telas/login/login_controlador.dart';
 import 'package:ze_draw/telas/rotas.dart';
 
 import '../../widgets/botao_default.dart';
@@ -8,7 +9,10 @@ import '../../widgets/botao_google.dart';
 import '../../widgets/campo_texto.dart';
 
 class LoginTela extends StatelessWidget {
-  const LoginTela({
+  final LoginControlador controlador;
+
+  const LoginTela(
+    this.controlador, {
     super.key,
   });
 
@@ -59,15 +63,22 @@ class LoginTela extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 64),
                     child: SvgPicture.asset('assets/images/logo.svg'),
                   ),
-                  const CampoTexto(label: 'E-mail ou Usuário'),
+                  CampoTexto(
+                    label: 'E-mail ou Usuário',
+                    controlador: controlador.usuario,
+                  ),
                   const SizedBox(height: 30),
-                  const CampoTexto(
+                  CampoTexto(
                     label: 'Senha',
-                    senha: true,
+                    oculto: true,
+                    controlador: controlador.senha,
                   ),
                   const _EsqueceuSenha(),
                   const SizedBox(height: 32),
-                  const BotaoEntrar(texto: 'Entrar',),
+                  BotaoEntrar(
+                    texto: 'Entrar',
+                    aoClicar: controlador.logar,
+                  ),
                   const _Divisor(),
                   const EntrarComGoogle(),
                   const _CriarConta(),
