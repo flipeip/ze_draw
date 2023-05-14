@@ -1,12 +1,17 @@
 import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
-import 'package:ze_draw/api/autenticacao.dart';
-import 'package:ze_draw/telas/login/login_tela.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../api/autenticacao.dart';
+import '../../utilidades/validacoes/email.dart';
+import 'login_tela.dart';
 
 class LoginControlador extends StatefulWidget {
-  final TextEditingController usuario = TextEditingController();
+  final TextEditingController email = TextEditingController();
   final TextEditingController senha = TextEditingController();
+  final ValueNotifier<String?> erroEmail = ValueNotifier(null);
+  final ValueNotifier<String?> erroSenha = ValueNotifier(null);
 
   LoginControlador({super.key});
 
@@ -14,12 +19,18 @@ class LoginControlador extends StatefulWidget {
   State<LoginControlador> createState() => _LoginControladorState();
 
   void logar() async {
+    if (!ValidacaoEmail(email.text).valido()) {
+      erroEmail.value = 'E-mail inválido';
+      return;
+    }
+
     try {
-      await Autenticacao.logar(usuario.text, senha.text);
+      await Autenticacao.logar(email.text, senha.text);
       // TODO: Ir para tela de feed.
+    } on AuthException catch (_) {
+      erroSenha.value = 'Login inválido. Verifique o e-mail e a senha.';
     } catch (e) {
       log(e.toString());
-      // TODO: Checar erros e mostrar na tela.
     }
   }
 }
