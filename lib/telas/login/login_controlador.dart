@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../api/autenticacao.dart';
 import '../../utilidades/validacoes/email.dart';
+import '../rotas.dart';
 import 'login_tela.dart';
 
 class LoginControlador extends StatefulWidget {
@@ -32,6 +33,10 @@ class LoginControlador extends StatefulWidget {
     } catch (e) {
       log(e.toString());
     }
+  }
+
+  void telaCadastro(BuildContext context) {
+    Navigator.of(context).pushNamed(Rotas.cadastro);
   }
 }
 

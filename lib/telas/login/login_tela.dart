@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 import '../../widgets/botao_default.dart';
-import '../../widgets/botao_google.dart';
 import '../../widgets/campo_texto.dart';
 import '../rotas.dart';
 import 'login_controlador.dart';
@@ -77,13 +76,15 @@ class LoginTela extends StatelessWidget {
                   ),
                   const _EsqueceuSenha(),
                   const SizedBox(height: 32),
-                  BotaoEntrar(
+                  BotaoPadrao(
                     texto: 'Entrar',
                     aoClicar: controlador.logar,
                   ),
                   const _Divisor(),
-                  const EntrarComGoogle(),
-                  const _CriarConta(),
+                  BotaoPadrao(
+                    texto: 'Cadastre-se',
+                    aoClicar: () => controlador.telaCadastro(context),
+                  ),
                 ],
               ),
             ),
@@ -94,7 +95,6 @@ class LoginTela extends StatelessWidget {
   }
 }
 
-// TODO: Adicionar mais espaço para clicar no botão de cadastrar
 class _CriarConta extends StatelessWidget {
   const _CriarConta();
 

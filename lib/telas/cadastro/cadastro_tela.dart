@@ -67,7 +67,7 @@ class CadastroTela extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   CampoTexto(
-                    label: 'Digite um e-mail',
+                    label: 'Digite seu e-mail',
                     controlador: controlador.email,
                     erro: controlador.erroEmail,
                   ),
@@ -75,25 +75,31 @@ class CadastroTela extends StatelessWidget {
                   // const CampoTexto(label: 'Digite um usuário'),
                   const SizedBox(height: 24),
                   CampoTexto(
-                    label: 'Digite uma senha',
+                    label: 'Digite sua senha',
                     controlador: controlador.senha,
                     erro: controlador.erroSenha,
                     oculto: true,
                   ),
-                  const SizedBox(height: 24),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
+                    child: Text(
+                      'Mínimo de 8 caracteres, incluindo letras, '
+                      'números e símbolos.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 0),
                   CampoTexto(
-                    label: 'Digite a senha novamente',
+                    label: 'Confirme sua senha',
                     controlador: controlador.senhaRepetir,
                     erro: controlador.erroSenhaRepetir,
                     oculto: true,
                   ),
                   const SizedBox(height: 24),
-                  BotaoEntrar(
+                  BotaoPadrao(
                     texto: 'Cadastrar-se',
                     aoClicar: () => controlador.criarConta(context),
                   ),
-                  // const _Divisor(),
-                  // const EntrarComGoogle(),
                 ],
               ),
             ),
@@ -104,6 +110,7 @@ class CadastroTela extends StatelessWidget {
                 onPressed: Navigator.of(context).pop,
                 icon: const Icon(
                   FontAwesomeIcons.arrowLeft,
+                  size: 36.0,
                   color: Color.fromARGB(255, 63, 133, 107),
                 )),
           )
