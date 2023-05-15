@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class BotaoEntrar extends StatelessWidget {
+class BotaoPadrao extends StatelessWidget {
   final String texto;
   final void Function() aoClicar;
 
-  const BotaoEntrar({
+  const BotaoPadrao({
     required this.texto,
     required this.aoClicar,
     super.key,
