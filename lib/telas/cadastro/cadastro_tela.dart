@@ -69,6 +69,7 @@ class CadastroTela extends StatelessWidget {
                   CampoTexto(
                     label: 'Digite um e-mail',
                     controlador: controlador.email,
+                    erro: controlador.erroEmail,
                   ),
                   // const SizedBox(height: 24),
                   // const CampoTexto(label: 'Digite um usuário'),
@@ -76,12 +77,14 @@ class CadastroTela extends StatelessWidget {
                   CampoTexto(
                     label: 'Digite uma senha',
                     controlador: controlador.senha,
+                    erro: controlador.erroSenha,
                     oculto: true,
                   ),
                   const SizedBox(height: 24),
                   CampoTexto(
                     label: 'Digite a senha novamente',
                     controlador: controlador.senhaRepetir,
+                    erro: controlador.erroSenhaRepetir,
                     oculto: true,
                   ),
                   const SizedBox(height: 24),
@@ -89,17 +92,17 @@ class CadastroTela extends StatelessWidget {
                     texto: 'Cadastrar-se',
                     aoClicar: () => controlador.criarConta(context),
                   ),
-                  const _Divisor(),
-                  const EntrarComGoogle(),
+                  // const _Divisor(),
+                  // const EntrarComGoogle(),
                 ],
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(4),
+            padding: const EdgeInsets.all(4),
             child: IconButton(
                 onPressed: Navigator.of(context).pop,
-                icon: Icon(
+                icon: const Icon(
                   FontAwesomeIcons.arrowLeft,
                   color: Color.fromARGB(255, 63, 133, 107),
                 )),
