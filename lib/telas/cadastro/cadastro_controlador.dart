@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:ze_draw/api/autenticacao.dart';
 import 'package:ze_draw/telas/cadastro/cadastro_tela.dart';
+import 'package:ze_draw/utilidades/validacoes/email.dart';
+import 'package:ze_draw/utilidades/validacoes/senha.dart';
 
 class CadastroControlador extends StatelessWidget {
   final email = TextEditingController();
   final senha = TextEditingController();
   final senhaRepetir = TextEditingController();
+  final erroEmail = ValueNotifier<String?>(null);
+  final erroSenha = ValueNotifier<String?>(null);
+  final erroSenhaRepetir = ValueNotifier<String?>(null);
 
   CadastroControlador({super.key});
 
@@ -15,23 +20,38 @@ class CadastroControlador extends StatelessWidget {
   }
 
   void criarConta(BuildContext context) {
-    String? mensagem;
-    if (senha.text != senhaRepetir.text) {
-      mensagem = 'Senha não corresponde';
+    bool erro = false;
+    final validacaoSenha = ValidacaoSenha(
+      senha.text,
+      comparacao: senhaRepetir.text,
+    ).validade();
+
+    switch (validacaoSenha) {
+      case ValidadeSenha.ok:
+        break;
+      case ValidadeSenha.senhaDiferentes:
+        erroSenha.value = validacaoSenha.mensagem;
+        erroSenhaRepetir.value = validacaoSenha.mensagem;
+        erro = true;
+        break;
+      default:
+        erroSenha.value = validacaoSenha.mensagem;
+        erro = true;
+        break;
     }
-    if (senha.text.length < 8) {
-      mensagem = 'Senha com menos de 8 caracteres';
+
+    if (!ValidacaoEmail(email.text).valido()) {
+      erroEmail.value = 'E-mail inválido';
+      erro = true;
     }
-    if (mensagem != null) {
-      final snackBar = SnackBar(content: Text(mensagem));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      return;
-    }
+
+    if (erro) return;
 
     Autenticacao.criarConta(email.text, senha.text).then((value) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Conta criada.')),
       );
+      Navigator.of(context).pop();
     });
   }
 }
