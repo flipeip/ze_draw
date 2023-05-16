@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/campo_pesquisa.dart';
 import 'package:dotted_border/dotted_border.dart';
 import '../../widgets/botao_default.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../api/api_post.dart';
 import '../../models/models.dart';
@@ -25,6 +26,10 @@ class _NovoPostTela extends State<NovoPostTela>{
   
   @override
   Widget build(BuildContext context) {
+    XFile? image;
+
+    final ImagePicker picker = ImagePicker();
+  
     return Scaffold(
       appBar: AppBar(
         title: const CampoPesquisa(label: 'Pesquisar'),
@@ -41,37 +46,43 @@ class _NovoPostTela extends State<NovoPostTela>{
             padding: EdgeInsets.all(28),
             child: Column(
               children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: DottedBorder(
-                      color: Color(0XFF679C8A),
-                      strokeWidth: 1,
-                      borderType: BorderType.RRect,
-                      radius: Radius.circular(15),
-                      dashPattern: [10, 10],
-                      child: Center(
-                        child:
-                          Padding(
-                            padding: EdgeInsets.all(20),
-                            child:
-                              Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child:
-                                        SvgPicture.asset(
-                                        'assets/images/photo_film.svg',
-                                        height: 45,
+                GestureDetector(
+                  onTap: (){
+                    Navigator.pop(context);
+                    picker.pickImage(source: ImageSource.gallery);
+                  },
+                  child: new Container(
+                    width: MediaQuery.of(context).size.width,
+                    child: DottedBorder(
+                        color: Color(0XFF679C8A),
+                        strokeWidth: 1,
+                        borderType: BorderType.RRect,
+                        radius: Radius.circular(15),
+                        dashPattern: [10, 10],
+                        child: Center(
+                          child:
+                            Padding(
+                              padding: EdgeInsets.all(20),
+                              child:
+                                Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child:
+                                          SvgPicture.asset(
+                                          'assets/images/photo_film.svg',
+                                          height: 45,
+                                        ),
                                       ),
-                                    ),
-                                    Text('Adicionar novo arquivo',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), ),
-                                    Text('Somente imagens ou vídeos'),
-                                  ],
-                              )
-                          )
-                      )
-                  )
+                                      Text('Adicionar novo arquivo',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), ),
+                                      Text('Somente imagens ou vídeos'),
+                                    ],
+                                )
+                            )
+                        )
+                    )
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 20),
@@ -150,7 +161,7 @@ class _NovoPostTela extends State<NovoPostTela>{
                     )
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical:10),
+                  padding: EdgeInsets.symmetric(vertical:8),
                   child:
                     BotaoEntrar(
                       texto: 'Publicar novo post',
