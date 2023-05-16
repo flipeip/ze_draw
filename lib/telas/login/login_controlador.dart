@@ -21,7 +21,7 @@ class LoginControlador extends StatefulWidget {
   @override
   State<LoginControlador> createState() => _LoginControladorState();
 
-  void logar() async {
+  void logar(BuildContext context) async {
     if (!ValidacaoEmail(email.text).valido()) {
       erroEmail.value = 'E-mail inválido';
       return;
@@ -30,6 +30,7 @@ class LoginControlador extends StatefulWidget {
     try {
       await Autenticacao.logar(email.text, senha.text);
       // TODO: Ir para tela de feed.
+      Navigator.of(context).pushNamed(Rotas.feed);
     } on AuthException catch (_) {
       erroSenha.value = 'Login inválido. Verifique o e-mail e a senha.';
     } catch (e) {

@@ -78,7 +78,7 @@ class LoginTela extends StatelessWidget {
                   const SizedBox(height: 32),
                   BotaoPadrao(
                     texto: 'Entrar',
-                    aoClicar: controlador.logar,
+                    aoClicar: () => controlador.logar(context),
                   ),
                   const _Divisor(),
                   BotaoPadrao(
