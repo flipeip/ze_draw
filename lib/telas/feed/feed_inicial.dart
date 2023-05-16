@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/campo_pesquisa.dart';
+import '../rotas.dart';
+import 'package:ze_draw/models/models.dart';
+import '../../api/api_post.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FeedTela extends StatelessWidget {
   const FeedTela({super.key});
 
   @override
   Widget build(BuildContext context) {
+    List<Postagem>? _postagem;
+
+    ApiPost lerPost = ApiPost();
+
+    Future<List<Postagem>> readData() async {
+      PostgrestResponse<dynamic> res = await lerPost.readData();
+
+      // if (res.error != null) {
+      //   throw Exception(res.error!.message);
+      // }
+      return (res.data as List<dynamic>).map((e) => Postagem.fromMap(e)).toList();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const CampoPesquisa(label: 'Pesquisar'),
@@ -62,7 +79,9 @@ class FeedTela extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: (){
+          Navigator.of(context).pushNamed(Rotas.novoPost);
+        },
         child: 
           Container(
             width: 60,
