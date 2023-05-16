@@ -163,7 +163,7 @@ class _NovoPostTela extends State<NovoPostTela>{
                 Padding(
                   padding: EdgeInsets.symmetric(vertical:8),
                   child:
-                    BotaoEntrar(
+                    BotaoPadrao(
                       texto: 'Publicar novo post',
                       aoClicar: _createData,
                     ),
