@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'utilidades/api_config.dart';
 import 'telas/rotas.dart';
+import 'utilidades/api_config.dart';
 import 'utilidades/tema.dart';
 
 void main() async {

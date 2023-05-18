@@ -1,16 +1,15 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/models.dart';
 import 'api.dart';
+import 'dart:io';
 
 class ApiPost {
-  Future<PostgrestResponse<dynamic>> createData(Postagem post) async {
+  Future<PostgrestResponse<dynamic>> createData(Postagem post, List<File> files) async {
     PostgrestResponse<dynamic> res = await api.from('postagem').insert(post.toMap());
-    // final arquivo = File('path/to/file');
-    // final String path = await supabase.storage.from('avatars').upload(
-    //   'public/avatar1.png',
-    //   avatarFile,
-    //   fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-    // );
+
+    for(var file in files) {
+      await api.storage.from("arquivos_postagem").upload(file.path, file);
+    }
     return res;
   }
   
