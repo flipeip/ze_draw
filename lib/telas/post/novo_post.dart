@@ -9,6 +9,7 @@ import 'package:dotted_border/dotted_border.dart';
 import '../../widgets/botao_default.dart';
 import 'package:file_picker/file_picker.dart';
 
+import '../../api/api_arq_post.dart';
 import '../../api/api_post.dart';
 import '../../api/api.dart';
 import '../../models/models.dart';
@@ -25,7 +26,8 @@ class _NovoPostTela extends State<NovoPostTela>{
 
   // instance
   ApiPost criarPost = ApiPost();
-
+  ApiArquivoPost criarArquivoPost = ApiArquivoPost();
+  
   List<File> files = [];
 
   bool uploadState = false;
@@ -49,19 +51,7 @@ class _NovoPostTela extends State<NovoPostTela>{
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () async{
-                    setState((){
-                      uploadState = false;
-                    });
-                    var pickedFile = await FilePicker.platform.pickFiles(
-                      allowMultiple: true,
-                      type: FileType.custom,
-                      allowedExtensions: ['png', 'jpg', 'svg', 'jpeg']
-                    );
-                    if (pickedFile != null) {
-                      files = pickedFile.paths.map((path) => File(path!)).toList();
-                    }
-                  },
+                  onTap: _pegarImagens,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     child: DottedBorder(
@@ -99,49 +89,42 @@ class _NovoPostTela extends State<NovoPostTela>{
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child:
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
                           decoration: BoxDecoration(
                             color: const Color(0XFFF1F1F1),
                             borderRadius: BorderRadius.circular(10)
                           ),
-                          width: 68.0,
-                          height: 68.0,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal:10),
-                          child:
-                            Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0XFFF1F1F1),
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              width: 68.0,
-                              height: 68.0,
-                            )
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          height: MediaQuery.of(context).size.width * 0.18,
                         ),
                         Container(
                           decoration: BoxDecoration(
                             color: const Color(0XFFF1F1F1),
                             borderRadius: BorderRadius.circular(10)
                           ),
-                          width: 68.0,
-                          height: 68.0,
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          height: MediaQuery.of(context).size.width * 0.18,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child:
-                            Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0XFFF1F1F1),
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              width: 68.0,
-                              height: 68.0,
-                            )
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0XFFF1F1F1),
+                            borderRadius: BorderRadius.circular(10)
+                          ),
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          height: MediaQuery.of(context).size.width * 0.18,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0XFFF1F1F1),
+                            borderRadius: BorderRadius.circular(10)
+                          ),
+                          width: MediaQuery.of(context).size.width * 0.18,
+                          height: MediaQuery.of(context).size.width * 0.18,
                         ),
                       ]
-                    )
+                    ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical:10),
@@ -187,14 +170,39 @@ class _NovoPostTela extends State<NovoPostTela>{
     );
   }
 
+  Future _pegarImagens() async{
+    try {
+        var pickedFile = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['png', 'jpg', 'svg', 'jpeg']
+      );
+      if (pickedFile != null) {
+        setState((){
+          files = pickedFile.paths.map((path) => File(path!)).toList();
+        });
+      }
+    } catch(error){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Erro inesperado")));
+    }
+  }
+
   Future _createData() async {
     List data = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
     int usuario = data[0]['id'];
 
     Postagem postagem = Postagem(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario);
+  
+    List<dynamic> res = await criarPost.createData(postagem);
 
-    PostgrestResponse<dynamic> res = await criarPost.createData(postagem, files);
+    for(var file in files) {
+      await api.storage.from("arquivos_postagem").upload(file.path.split(Platform.pathSeparator).last, file);
+      Arquivo arquivo = Arquivo(arquivo: file.path.split(Platform.pathSeparator).last, postagem: res[0]['id']);
 
+      criarArquivoPost.createData(arquivo);
+    }
+    
+    
     // if (res.error != null) {
     //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error!.message)));
     // }
