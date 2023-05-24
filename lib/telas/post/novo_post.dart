@@ -1,18 +1,20 @@
 import 'dart:io';
 
+import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../widgets/campo_pesquisa.dart';
-import 'package:dotted_border/dotted_border.dart';
-import '../../widgets/botao_default.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:badges/badges.dart' as badges;
+import 'package:uuid/uuid.dart';
 
+import '../../api/api.dart';
 import '../../api/api_arq_post.dart';
 import '../../api/api_post.dart';
-import '../../api/api.dart';
 import '../../models/models.dart';
+import '../../widgets/botao_default.dart';
+import '../../widgets/campo_pesquisa.dart';
 import 'novo_post_controlador.dart';
 
 class NovoPostTela extends StatefulWidget {
@@ -24,13 +26,33 @@ class NovoPostTela extends StatefulWidget {
 class _NovoPostTela extends State<NovoPostTela>{
   NovoPostControlador controlador = NovoPostControlador();
 
-  // instance
   ApiPost criarPost = ApiPost();
   ApiArquivoPost criarArquivoPost = ApiArquivoPost();
   
-  List<File> files = [];
+  List<File> imagensSelecionadas = [];
 
-  bool uploadState = false;
+  Future<void> selecionarImagens() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['png', 'jpg', 'svg', 'jpeg']
+      );
+
+    if (result != null) {
+      List<File> files = result.paths.map((path) => File(path!)).toList();
+      setState(() {
+        imagensSelecionadas.addAll(files);
+      });
+    }
+  }
+
+  void removerImagem(int index) {
+    setState(() {
+      imagensSelecionadas.removeAt(index);
+    });
+  }
+
+  bool _isBadgeTapped = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +73,7 @@ class _NovoPostTela extends State<NovoPostTela>{
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: _pegarImagens,
+                  onTap: selecionarImagens,
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     child: DottedBorder(
@@ -86,45 +108,53 @@ class _NovoPostTela extends State<NovoPostTela>{
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.only(top:15, bottom: 5),
                   child:
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child:
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0XFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          width: MediaQuery.of(context).size.width * 0.18,
-                          height: MediaQuery.of(context).size.width * 0.18,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0XFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          width: MediaQuery.of(context).size.width * 0.18,
-                          height: MediaQuery.of(context).size.width * 0.18,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0XFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          width: MediaQuery.of(context).size.width * 0.18,
-                          height: MediaQuery.of(context).size.width * 0.18,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0XFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          width: MediaQuery.of(context).size.width * 0.18,
-                          height: MediaQuery.of(context).size.width * 0.18,
-                        ),
-                      ]
+                      children: List.generate(imagensSelecionadas.length, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            if (_isBadgeTapped) {
+                              removerImagem(index);
+                            }
+                          },
+                          child: Badge(
+                            alignment: AlignmentDirectional(53, 0),
+                            largeSize: 20,
+                            label: Icon(FontAwesomeIcons.xmark, color: Colors.white, size: 12),
+                            backgroundColor: Color(0xFF679C8A),
+                            child: GestureDetector(
+                              onTap: () {
+                                  setState(() {
+                                    _isBadgeTapped = true;
+                                  });
+                                },
+                              child:
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0XFFF1F1F1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  margin: EdgeInsets.all(4),
+                                  width: MediaQuery.of(context).size.width * 0.18,
+                                  height: MediaQuery.of(context).size.width * 0.18,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.file(
+                                      imagensSelecionadas[index],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                              )
+                            )
+                          )
+                        );
+                      }),
                     ),
+                  )
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical:10),
@@ -170,22 +200,6 @@ class _NovoPostTela extends State<NovoPostTela>{
     );
   }
 
-  Future _pegarImagens() async{
-    try {
-        var pickedFile = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.custom,
-        allowedExtensions: ['png', 'jpg', 'svg', 'jpeg']
-      );
-      if (pickedFile != null) {
-        setState((){
-          files = pickedFile.paths.map((path) => File(path!)).toList();
-        });
-      }
-    } catch(error){
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Erro inesperado")));
-    }
-  }
 
   Future _createData() async {
     List data = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
@@ -195,19 +209,22 @@ class _NovoPostTela extends State<NovoPostTela>{
   
     List<dynamic> res = await criarPost.createData(postagem);
 
-    for(var file in files) {
-      await api.storage.from("arquivos_postagem").upload(file.path.split(Platform.pathSeparator).last, file);
+    for(var file in imagensSelecionadas) {
+      final uuid = Uuid();
+
+      await api.storage.from("arquivos_postagem").upload('${res[0]['id']}/${uuid.v4()}.${path.extension(file.path)}', file);
       Arquivo arquivo = Arquivo(arquivo: file.path.split(Platform.pathSeparator).last, postagem: res[0]['id']);
 
       criarArquivoPost.createData(arquivo);
     }
-    
     
     // if (res.error != null) {
     //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error!.message)));
     // }
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post criado!")));
+
+    Navigator.of(context).pop();
 
   }
   
