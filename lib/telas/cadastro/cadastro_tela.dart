@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 import '../../widgets/botao_default.dart';
-import '../../widgets/botao_google.dart';
 import '../../widgets/campo_texto.dart';
 import 'cadastro_controlador.dart';
 

@@ -9,6 +9,8 @@ import 'package:path/path.dart' as path;
 import 'package:badges/badges.dart' as badges;
 import 'package:uuid/uuid.dart';
 
+import '../feed/feed_inicial.dart';
+
 import '../../api/api.dart';
 import '../../api/api_arq_post.dart';
 import '../../api/api_post.dart';
@@ -122,7 +124,7 @@ class _NovoPostTela extends State<NovoPostTela>{
                             }
                           },
                           child: Badge(
-                            alignment: AlignmentDirectional(53, 0),
+                            alignment: AlignmentDirectional.topEnd,
                             largeSize: 20,
                             label: Icon(FontAwesomeIcons.xmark, color: Colors.white, size: 12),
                             backgroundColor: Color(0xFF679C8A),
@@ -205,15 +207,16 @@ class _NovoPostTela extends State<NovoPostTela>{
     List data = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
     int usuario = data[0]['id'];
 
-    Postagem postagem = Postagem(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario);
+    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario);
   
     List<dynamic> res = await criarPost.createData(postagem);
 
     for(var file in imagensSelecionadas) {
       final uuid = Uuid();
+      final new_uuid = uuid.v4();
 
-      await api.storage.from("arquivos_postagem").upload('${res[0]['id']}/${uuid.v4()}.${path.extension(file.path)}', file);
-      Arquivo arquivo = Arquivo(arquivo: file.path.split(Platform.pathSeparator).last, postagem: res[0]['id']);
+      await api.storage.from("arquivos_postagem").upload('${res[0]['id']}/${new_uuid+path.extension(file.path)}', file);
+      Arquivo arquivo = Arquivo(arquivo: new_uuid+path.extension(file.path), postagem: res[0]['id']);
 
       criarArquivoPost.createData(arquivo);
     }
@@ -222,9 +225,12 @@ class _NovoPostTela extends State<NovoPostTela>{
     //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error!.message)));
     // }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post criado!")));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Arte publicada! :)", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
 
-    Navigator.of(context).pop();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => FeedTela()),
+    );
 
   }
   

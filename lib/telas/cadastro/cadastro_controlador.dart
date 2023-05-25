@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ze_draw/api/autenticacao.dart';
-import 'package:ze_draw/api/api.dart';
 import 'package:ze_draw/telas/cadastro/cadastro_tela.dart';
 import 'package:ze_draw/utilidades/validacoes/email.dart';
 import 'package:ze_draw/utilidades/validacoes/senha.dart';
