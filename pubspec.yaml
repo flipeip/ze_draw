@@ -18,6 +18,9 @@ dependencies:
   file_picker: ^5.3.0
   badges: ^3.1.1
   carousel_slider: ^4.2.1
+  gradient_borders: ^1.0.0
+  flutter_datetime_picker: ^1.5.1
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

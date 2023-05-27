@@ -21,6 +21,12 @@ class FeedTela extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pushNamed(Rotas.login);
+          },
+        ),
         title: const CampoPesquisa(label: 'Pesquisar'),
         actions: [
           IconButton(onPressed: (){}, icon: Icon(FontAwesomeIcons.ellipsisVertical), color: Color(0xFF679C8A)),
@@ -102,20 +108,36 @@ class FeedTela extends StatelessWidget {
   }
 }
 
-class PostagemWidget extends StatelessWidget {
+class PostagemWidget extends StatefulWidget {
   final Postagem postagem;
 
-  DateTime dataAtual = DateTime.now();
 
   PostagemWidget({required this.postagem});
+
+  @override
+  State<PostagemWidget> createState() => _PostagemWidgetState();
+}
+
+class _PostagemWidgetState extends State<PostagemWidget> {
+  DateTime dataAtual = DateTime.now();
+
+  Future<List<Usuario>> getUsuarioPostagem(int? usuarioId) async {
+    List<dynamic> response = await api.from('usuario').select().eq('id', usuarioId);
+    return (response).map((e) => Usuario.fromMap(e)).toList();
+  }
 
   Future<List<Arquivo>> getArquivosDaPostagem(int? postagemId) async {
     List<dynamic> response = await api.from('arquivo').select().eq('postagem', postagemId);
     return (response).map((e) => Arquivo.fromMap(e)).toList();
   }
 
-  Future<String> getBucketUrl(String arquivo) async {
+  Future<String> getArquivoBucketUrl(String arquivo) async {
     final response = await api.storage.from('arquivos_postagem').getPublicUrl(arquivo);
+    return response as String;
+  }
+
+  Future<String> getUsuarioBucketUrl(String arquivo) async {
+    final response = await api.storage.from('fotos_usuario').getPublicUrl(arquivo);
     return response as String;
   }
 
@@ -125,26 +147,59 @@ class PostagemWidget extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.cyan,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(postagem.titulo),
-                    Text('${dataAtual.difference(DateTime.parse(postagem.data_publicacao)).inHours} hora(s) atrás'),
-                  ],
+          child: FutureBuilder<List<Usuario>>(
+            future: getUsuarioPostagem(widget.postagem.usuario_id),
+            builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            } else {
+              final usuario = snapshot.data ?? null;
+              return Row(
+              children: [
+                FutureBuilder<String>(
+                  future: getUsuarioBucketUrl('${usuario?[0].foto}'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    } else if (snapshot.hasData) {
+                      final imageUrl = snapshot.data!;
+                      return CircleAvatar(
+                        backgroundImage: Image.network(imageUrl).image,
+                      );
+                    } else {
+                      return Container(
+                        width: 100,
+                        height: 100,
+                        child: Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 50),
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 197, 197, 197),
+                          borderRadius: BorderRadius.all(Radius.circular(50))
+                        ),
+                      );
+                    }
+                  },
                 ),
-              )
-            ],
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(usuario?[0].nome as String),
+                      Text('${dataAtual.difference(DateTime.parse(widget.postagem.data_publicacao)).inHours} hora(s) atrás'),
+                    ],
+                  ),
+                )
+              ],
+            );
+            }}
           ),
         ),
         FutureBuilder<List<Arquivo>>(
-          future: getArquivosDaPostagem(postagem.id),
+          future: getArquivosDaPostagem(widget.postagem.id),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
@@ -161,7 +216,7 @@ class PostagemWidget extends StatelessWidget {
                       children: arquivos
                         .map(
                           (arquivo) => FutureBuilder<String>(
-                            future: getBucketUrl('${postagem.id}/${arquivo.arquivo}'),
+                            future: getArquivoBucketUrl('${widget.postagem.id}/${arquivo.arquivo}'),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return CircularProgressIndicator();

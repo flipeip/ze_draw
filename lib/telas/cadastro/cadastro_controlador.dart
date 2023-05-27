@@ -3,6 +3,7 @@ import 'package:ze_draw/api/autenticacao.dart';
 import 'package:ze_draw/telas/cadastro/cadastro_tela.dart';
 import 'package:ze_draw/utilidades/validacoes/email.dart';
 import 'package:ze_draw/utilidades/validacoes/senha.dart';
+import '../rotas.dart';
 
 class CadastroControlador extends StatelessWidget {
   final email = TextEditingController();
@@ -51,7 +52,7 @@ class CadastroControlador extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Conta criada.')),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pushNamed(Rotas.novoPerfil);
     });
   }
 }

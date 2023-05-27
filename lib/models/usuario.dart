@@ -2,17 +2,21 @@
 import 'dart:convert';
 
 class Usuario {
-  final String nome;
-  final String foto;
-  final bool status;
-  final String celular;
+  final String? nome;
+  final String? foto;
+  final bool? status;
+  final String? celular;
   final String user_id;
+  final String? data_nascimento;
+  final String? usuario;
   Usuario({
-    required this.nome,
-    required this.foto,
-    required this.status,
-    required this.celular,
+    this.nome,
+    this.foto,
+    this.status,
+    this.celular,
     required this.user_id,
+    this.data_nascimento,
+    this.usuario,
   });
 
   Usuario copyWith({
@@ -21,6 +25,8 @@ class Usuario {
     bool? status,
     String? celular,
     String? user_id,
+    String? data_nascimento,
+    String? usuario,
   }) {
     return Usuario(
       nome: nome ?? this.nome,
@@ -28,6 +34,8 @@ class Usuario {
       status: status ?? this.status,
       celular: celular ?? this.celular,
       user_id: user_id ?? this.user_id,
+      data_nascimento: data_nascimento ?? this.data_nascimento,
+      usuario: usuario ?? this.usuario,
     );
   }
 
@@ -38,16 +46,20 @@ class Usuario {
       'status': status,
       'celular': celular,
       'user_id': user_id,
+      'data_nascimento': data_nascimento,
+      'usuario': usuario,
     };
   }
 
   factory Usuario.fromMap(Map<String, dynamic> map) {
     return Usuario(
-      nome: map['nome'] as String,
-      foto: map['foto'] as String,
-      status: map['status'] as bool,
-      celular: map['celular'] as String,
+      nome: map['nome'] != null ? map['nome'] as String : null,
+      foto: map['foto'] != null ? map['foto'] as String : null,
+      status: map['status'] != null ? map['status'] as bool : null,
+      celular: map['celular'] != null ? map['celular'] as String : null,
       user_id: map['user_id'] as String,
+      data_nascimento: map['data_nascimento'] != null ? map['data_nascimento'] as String : null,
+      usuario: map['usuario'] != null ? map['usuario'] as String : null,
     );
   }
 
@@ -57,7 +69,7 @@ class Usuario {
 
   @override
   String toString() {
-    return 'Usuario(nome: $nome, foto: $foto, status: $status, celular: $celular, user_id: $user_id)';
+    return 'Usuario(nome: $nome, foto: $foto, status: $status, celular: $celular, user_id: $user_id, data_nascimento: $data_nascimento, usuario: $usuario)';
   }
 
   @override
@@ -69,7 +81,9 @@ class Usuario {
       other.foto == foto &&
       other.status == status &&
       other.celular == celular &&
-      other.user_id == user_id;
+      other.user_id == user_id &&
+      other.data_nascimento == data_nascimento &&
+      other.usuario == usuario;
   }
 
   @override
@@ -78,6 +92,8 @@ class Usuario {
       foto.hashCode ^
       status.hashCode ^
       celular.hashCode ^
-      user_id.hashCode;
+      user_id.hashCode ^
+      data_nascimento.hashCode ^
+      usuario.hashCode;
   }
 }

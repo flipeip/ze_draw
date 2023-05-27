@@ -47,7 +47,7 @@ class _CampoTextoState extends State<CampoTexto> {
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 24,
-            vertical: 4,
+            vertical: 2,
           ),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,

@@ -57,7 +57,7 @@ class LoginTela extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 112),
+                  const SizedBox(height: 66),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 64),
                     child: SvgPicture.asset('assets/images/logo.svg'),
@@ -84,6 +84,7 @@ class LoginTela extends StatelessWidget {
                   BotaoPadrao(
                     texto: 'Cadastre-se',
                     aoClicar: () => controlador.telaCadastro(context),
+                    buttonType: 'lightButton',
                   ),
                 ],
               ),
