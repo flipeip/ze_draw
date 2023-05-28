@@ -5,7 +5,7 @@ class Postagem {
   final int? id;
   final String titulo;
   final String descricao;
-  final int usuario_id;
+  late final int usuario_id;
   final String data_publicacao;
   Postagem({
     this.id,

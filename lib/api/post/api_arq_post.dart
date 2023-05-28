@@ -1,5 +1,5 @@
-import '../../models/models.dart';
-import 'api.dart';
+import '../../../models/models.dart';
+import '../api.dart';
 
 class ApiArquivoPost {
   Future<List<dynamic>> createData(Arquivo arquivo) async {

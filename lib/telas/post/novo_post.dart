@@ -10,11 +10,12 @@ import 'package:badges/badges.dart' as badges;
 import 'package:uuid/uuid.dart';
 import 'package:ze_draw/telas/tela_inicial.dart';
 
+import '../../api/autenticacao.dart';
 import '../feed/feed_inicial.dart';
 
 import '../../api/api.dart';
-import '../../api/api_arq_post.dart';
-import '../../api/api_post.dart';
+import '../../api/post/api_arq_post.dart';
+import '../../api/post/api_post.dart';
 import '../../models/models.dart';
 import '../../widgets/botao_default.dart';
 import '../../widgets/campo_pesquisa.dart';
@@ -205,8 +206,7 @@ class _NovoPostTela extends State<NovoPostTela>{
 
 
   Future _createData() async {
-    List data = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
-    int usuario = data[0]['id'];
+    int usuario = int.parse(Autenticacao.usuario ?? '');
 
     PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario);
   

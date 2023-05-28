@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../api/autenticacao.dart';
+import '../../api/post/api_curtidas.dart';
 import '../rotas.dart';
 import 'package:ze_draw/models/models.dart';
 import '../../api/api.dart';
-import '../../api/api_post.dart';
+import '../../api/post/api_post.dart';
 
 class FeedTela extends StatelessWidget {
   const FeedTela({super.key});
@@ -26,9 +28,9 @@ class FeedTela extends StatelessWidget {
             return Center(child: Text(snapshot.error.toString()));
           } else if (snapshot.hasData) {
             return ListView.builder(
-              itemCount: (snapshot.data! as List<Postagem>).length,
+              itemCount: (snapshot.data!).length,
               itemBuilder: ((BuildContext context, int index) {
-              Postagem postagem = (snapshot.data! as List<Postagem>)[index];
+              Postagem postagem = (snapshot.data!)[index];
               return PostagemWidget(postagem: postagem);
               }
             ));
@@ -44,7 +46,7 @@ class FeedTela extends StatelessWidget {
           Container(
             width: 60,
             height: 60,
-            child: Icon(FontAwesomeIcons.paintbrush, color: Colors.white,),
+            child: const Icon(FontAwesomeIcons.paintbrush, color: Colors.white,),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(colors: [Color(0XFFFF2626), Color(0XFFFFA800), Color(0XFF34D1DB)]),
@@ -59,7 +61,6 @@ class FeedTela extends StatelessWidget {
 class PostagemWidget extends StatefulWidget {
   final Postagem postagem;
 
-
   PostagemWidget({required this.postagem});
 
   @override
@@ -69,25 +70,7 @@ class PostagemWidget extends StatefulWidget {
 class _PostagemWidgetState extends State<PostagemWidget> {
   DateTime dataAtual = DateTime.now();
 
-  Future<List<Usuario>> getUsuarioPostagem(int? usuarioId) async {
-    List<dynamic> response = await api.from('usuario').select().eq('id', usuarioId);
-    return (response).map((e) => Usuario.fromMap(e)).toList();
-  }
-
-  Future<List<Arquivo>> getArquivosDaPostagem(int? postagemId) async {
-    List<dynamic> response = await api.from('arquivo').select().eq('postagem', postagemId);
-    return (response).map((e) => Arquivo.fromMap(e)).toList();
-  }
-
-  Future<String> getArquivoBucketUrl(String arquivo) async {
-    final response = await api.storage.from('arquivos_postagem').getPublicUrl(arquivo);
-    return response as String;
-  }
-
-  Future<String> getUsuarioBucketUrl(String arquivo) async {
-    final response = await api.storage.from('fotos_usuario').getPublicUrl(arquivo);
-    return response as String;
-  }
+  ApiCurtidasPost curtir = ApiCurtidasPost();
 
   @override
   Widget build(BuildContext context) {
@@ -113,16 +96,16 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                       return CircularProgressIndicator();
                     } else if (snapshot.hasError) {
                       return Text('${snapshot.error}');
-                    } else if (snapshot.hasData) {
+                    } else if (snapshot.hasData && usuario?[0].foto != null) {
                       final imageUrl = snapshot.data!;
                       return CircleAvatar(
                         backgroundImage: Image.network(imageUrl).image,
                       );
                     } else {
                       return Container(
-                        width: 100,
-                        height: 100,
-                        child: Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 50),
+                        width: 42,
+                        height: 42,
+                        child: Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 197, 197, 197),
                           borderRadius: BorderRadius.all(Radius.circular(50))
@@ -201,15 +184,49 @@ class _PostagemWidgetState extends State<PostagemWidget> {
               children: [
                 Row(
                   children: [
-                    TextButton.icon(
-                      onPressed: () {},
-                      icon: Icon(FontAwesomeIcons.solidStar, color: Color(0xFF679C8A)),
-                      label: Text('82', style: TextStyle(color: Color(0xFF679C8A))),
+                    FutureBuilder<List<dynamic>>(
+                    future: getCurtidasPostagem(widget.postagem.id),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasData) {
+                        final curtidas = snapshot.data!.length;
+                        var curtido = false;
+                        try {
+                          if ('${Autenticacao.usuario}' == '${snapshot.data![0]['usuario_id']}'){
+                            curtido = true;
+                          }
+                        }catch (error){
+                          curtido = false;
+                        }
+                        return TextButton.icon(
+                          onPressed: () => _curtirPost(widget.postagem.id),
+                          icon: Icon(FontAwesomeIcons.solidStar, color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898)),
+                          label: Text('${curtidas}', style: TextStyle(color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898))),
+                        );
+                      } else {
+                          return Text('Error');
+                        }
+                      },
                     ),
-                    TextButton.icon(
-                      onPressed: () {},
-                      icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
-                      label: Text('22', style: TextStyle(color: Color(0xFF989898))),
+                    FutureBuilder<List<dynamic>>(
+                    future: getComentariosPostagem(widget.postagem.id),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      } else if (snapshot.hasData) {
+                        final comentarios = snapshot.data!.length;
+                        return TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                          label: Text('${comentarios}', style: TextStyle(color: Color(0xFF989898))),
+                        );
+                      } else {
+                          return Text('Error');
+                        }
+                      },
                     ),
                     IconButton(
                       onPressed: () {},
@@ -217,7 +234,8 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                       color: Color(0xFF989898),
                     ),
                   ],
-                )
+                ),
+              
               ],
             ),
           ),
@@ -225,4 +243,52 @@ class _PostagemWidgetState extends State<PostagemWidget> {
       ],
     );
   }
+
+  Future<List<Usuario>> getUsuarioPostagem(int? usuarioId) async {
+    List<dynamic> usuarioPostagem = await api.from('usuario').select().eq('id', usuarioId);
+    return (usuarioPostagem).map((e) => Usuario.fromMap(e)).toList();
+  }
+
+  Future<List<Arquivo>> getArquivosDaPostagem(int? postagemId) async {
+    List<dynamic> arquivosPostagem = await api.from('arquivo').select().eq('postagem', postagemId);
+    return (arquivosPostagem).map((e) => Arquivo.fromMap(e)).toList();
+  }
+
+  Future<String> getArquivoBucketUrl(String arquivo) async {
+    final arquivoBucket = await api.storage.from('arquivos_postagem').getPublicUrl(arquivo);
+    return arquivoBucket as String;
+  }
+
+  Future<String> getUsuarioBucketUrl(String arquivo) async {
+    final usuarioBucket = await api.storage.from('fotos_usuario').getPublicUrl(arquivo);
+    return usuarioBucket as String;
+  }
+
+  Future<List<dynamic>> getCurtidasPostagem(int? postagemId) async {
+    List<dynamic> curtidasPost = await api.from('curtidas').select().eq('postagem_id', postagemId);
+    return curtidasPost;
+  }
+  
+  Future<List<dynamic>> getComentariosPostagem(int? postagemId) async {
+    List<dynamic> comentariosPost = await api.from('comentario').select().eq('postagem', postagemId);
+    return comentariosPost;
+  }
+
+
+  Future _curtirPost(postagemId) async {
+    int usuario = int.parse(Autenticacao.usuario ?? '');
+
+    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario);
+    try {
+      await curtir.createData(curtida);
+    } catch(error){
+      await curtir.deleteData('${postagemId}', '${usuario}');
+    }
+
+    setState(() {
+      getCurtidasPostagem(postagemId);
+    });
+    
+  }
+  
 }

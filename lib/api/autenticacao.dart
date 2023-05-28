@@ -15,15 +15,15 @@ class Autenticacao {
       password: senha,
     );
   }
-
-  // static Future<PostgrestResponse<dynamic>> usuarioUser() async{
-  //   PostgrestResponse<dynamic> data = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
-  //   return data;
-  // }
   
   static get user => api.auth.currentUser;
 
   static get sessao => api.auth.currentSession;
 
-  // static get usuario => usuarioUser();
+  static String? usuario;
+
+  static Future<void> getUsuario() async {
+    List<dynamic> res = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
+    usuario = res[0]['id'];
+  }
 }

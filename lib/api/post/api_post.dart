@@ -1,5 +1,5 @@
-import '../../models/models.dart';
-import 'api.dart';
+import '../../../models/models.dart';
+import '../api.dart';
 
 class ApiPost {
   Future<List<dynamic>> createData(PostagemCreate post) async {
