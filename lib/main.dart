@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'utilidades/api_config.dart';
+import 'api/autenticacao.dart';
 import 'telas/rotas.dart';
+import 'utilidades/api_config.dart';
 import 'utilidades/tema.dart';
 
 void main() async {
   await iniciarDependencias();
+  await Autenticacao.getUsuario();
   runApp(const MainApp());
 }
 

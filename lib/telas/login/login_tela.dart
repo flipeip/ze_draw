@@ -50,42 +50,45 @@ class LoginTela extends StatelessWidget {
               height: alturaImagens,
             ),
           ),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 112),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 64),
-                    child: SvgPicture.asset('assets/images/logo.svg'),
-                  ),
-                  CampoTexto(
-                    label: 'E-mail',
-                    controlador: controlador.email,
-                    erro: controlador.erroEmail,
-                  ),
-                  const SizedBox(height: 30),
-                  CampoTexto(
-                    label: 'Senha',
-                    oculto: true,
-                    controlador: controlador.senha,
-                    erro: controlador.erroSenha,
-                  ),
-                  const _EsqueceuSenha(),
-                  const SizedBox(height: 32),
-                  BotaoPadrao(
-                    texto: 'Entrar',
-                    aoClicar: controlador.logar,
-                  ),
-                  const _Divisor(),
-                  BotaoPadrao(
-                    texto: 'Cadastre-se',
-                    aoClicar: () => controlador.telaCadastro(context),
-                  ),
-                ],
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 64),
+                      child: SvgPicture.asset('assets/images/logo.svg'),
+                    ),
+                    CampoTexto(
+                      label: 'E-mail',
+                      controlador: controlador.email,
+                      erro: controlador.erroEmail,
+                    ),
+                    const SizedBox(height: 30),
+                    CampoTexto(
+                      label: 'Senha',
+                      oculto: true,
+                      controlador: controlador.senha,
+                      erro: controlador.erroSenha,
+                    ),
+                    const _EsqueceuSenha(),
+                    const SizedBox(height: 32),
+                    BotaoPadrao(
+                      texto: 'Entrar',
+                      aoClicar: () => controlador.logar(context),
+                    ),
+                    const _Divisor(),
+                    BotaoPadrao(
+                      texto: 'Cadastre-se',
+                      aoClicar: () => controlador.telaCadastro(context),
+                      buttonType: 'lightButton',
+                    ),
+                    
+                  ],
+                ),
               ),
             ),
           ),

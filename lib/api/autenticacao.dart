@@ -1,5 +1,4 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'api.dart';
 
 class Autenticacao {
@@ -16,8 +15,15 @@ class Autenticacao {
       password: senha,
     );
   }
-
-  static get usuario => api.auth.currentUser;
+  
+  static get user => api.auth.currentUser;
 
   static get sessao => api.auth.currentSession;
+
+  static String? usuario;
+
+  static Future<void> getUsuario() async {
+    List<dynamic> res = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);
+    usuario = res[0]['id'];
+  }
 }
