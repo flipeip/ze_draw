@@ -71,108 +71,110 @@ class _NovoPerfilTela extends State<NovoPerfilTela>{
           backgroundColor: Colors.transparent,
           
         ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 56),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.90,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-                    ),
-                    child:
-                     Transform.translate(
-                      offset: Offset(0, -50.0),
-                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal:32.0),
-                        child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (_isBadgeTapped) {
-                              selecionarImagem();
-                            }
-                          },
-                          child: Badge(
-                              alignment: AlignmentDirectional.bottomEnd,
-                              backgroundColor: Color(0xFF679C8A),
-                              largeSize: 32,
-                              padding: EdgeInsets.all(8),
-                              label: Icon(FontAwesomeIcons.pencil, color: Colors.white, size: 16),
-                              child:
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _isBadgeTapped = true;
-                                    });
-                                  },
-                                  child: Container(
-                                  width: 100,
-                                  height: 100,
-                                  child: imagemSelecionada != null
-                                    ? null
-                                    : Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 50),
-                                  decoration: BoxDecoration(
-                                    image: imagemSelecionada != null
-                                    ? DecorationImage(
-                                        image: FileImage(imagemSelecionada!),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
-                                    color: Color.fromARGB(255, 197, 197, 197),
-                                    borderRadius: BorderRadius.all(Radius.circular(50))
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.82,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+                      ),
+                      child:
+                       Transform.translate(
+                        offset: Offset(0, -50.0),
+                         child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal:32.0),
+                          child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (_isBadgeTapped) {
+                                selecionarImagem();
+                              }
+                            },
+                            child: Badge(
+                                alignment: AlignmentDirectional.bottomEnd,
+                                backgroundColor: Color(0xFF679C8A),
+                                largeSize: 32,
+                                padding: EdgeInsets.all(8),
+                                label: Icon(FontAwesomeIcons.pencil, color: Colors.white, size: 16),
+                                child:
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _isBadgeTapped = true;
+                                      });
+                                    },
+                                    child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    child: imagemSelecionada != null
+                                      ? null
+                                      : Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 50),
+                                    decoration: BoxDecoration(
+                                      image: imagemSelecionada != null
+                                      ? DecorationImage(
+                                          image: FileImage(imagemSelecionada!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null,
+                                      color: Color.fromARGB(255, 197, 197, 197),
+                                      borderRadius: BorderRadius.all(Radius.circular(50))
+                                    ),
                                   ),
                                 ),
                               ),
+                          ),
+                            const SizedBox(height: 18),
+                            CampoTexto(
+                              label: 'Usuário',
+                              controlador: controlador.usuario,
                             ),
+                            const SizedBox(height: 24),
+                            CampoTexto(
+                              label: 'Nome',
+                              controlador: controlador.nome,
+                            ),
+                            const SizedBox(height: 24),
+                            CampoTexto(
+                              label: 'Celular',
+                              controlador: controlador.celular,
+                            ),
+                            const SizedBox(height: 24),
+                            CampoTexto(
+                              label: 'Data Nascimento',
+                              controlador: controlador.dataNascimento,
+                            ),
+                            const SizedBox(height: 24),
+                            BotaoPadrao(
+                              texto: 'Salvar Perfil',
+                              aoClicar: _createData,
+                            ),
+                            const SizedBox(height: 32),
+                            BotaoPadrao(
+                              texto: 'Continuar sem perfil',
+                              aoClicar: _createWithNoData,
+                              buttonType: 'lightButton',
+                            ),
+                          ],
                         ),
-                          const SizedBox(height: 24),
-                          CampoTexto(
-                            label: 'Usuário',
-                            controlador: controlador.usuario,
-                          ),
-                          const SizedBox(height: 24),
-                          CampoTexto(
-                            label: 'Nome',
-                            controlador: controlador.nome,
-                          ),
-                          const SizedBox(height: 24),
-                          CampoTexto(
-                            label: 'Celular',
-                            controlador: controlador.celular,
-                          ),
-                          const SizedBox(height: 24),
-                          CampoTexto(
-                            label: 'Data Nascimento',
-                            controlador: controlador.dataNascimento,
-                          ),
-                          const SizedBox(height: 32),
-                          BotaoPadrao(
-                            texto: 'Salvar Perfil',
-                            aoClicar: _createData,
-                          ),
-                          const _Divisor(),
-                          BotaoPadrao(
-                            texto: 'Continuar sem perfil',
-                            aoClicar: _createWithNoData,
-                            buttonType: 'lightButton',
-                          ),
-                        ],
                       ),
                     ),
                   ),
+                  ],
                 ),
-                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -191,7 +193,7 @@ class _NovoPerfilTela extends State<NovoPerfilTela>{
     // }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Perfil criado com sucesso!", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
 
-    Navigator.of(context).pushNamed(Rotas.feed);
+    Navigator.of(context).pushNamed(Rotas.telaIncial);
   }
 
   Future _createWithNoData() async {
@@ -200,7 +202,7 @@ class _NovoPerfilTela extends State<NovoPerfilTela>{
     // if (res.error != null) {
     //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error!.message)));
     // }
-    Navigator.of(context).pushNamed(Rotas.feed);
+    Navigator.of(context).pushNamed(Rotas.telaIncial);
   }
 }
 
