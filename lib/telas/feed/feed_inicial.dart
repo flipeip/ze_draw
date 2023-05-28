@@ -210,35 +210,33 @@ class _PostagemWidgetState extends State<PostagemWidget> {
               
               return SizedBox(
                   height: 300,
-                  child: Scrollbar(
-                    child: PageView(
-                      scrollDirection: Axis.horizontal,
-                      children: arquivos
-                        .map(
-                          (arquivo) => FutureBuilder<String>(
-                            future: getArquivoBucketUrl('${widget.postagem.id}/${arquivo.arquivo}'),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('${snapshot.error}');
-                              } else if (snapshot.hasData) {
-                                final imageUrl = snapshot.data!;
-                                return Container(
-                                    height: 300,
-                                    child: FittedBox(
-                                      fit: BoxFit.cover,
-                                      child: Image.network(imageUrl)
-                                    ),
-                                  );
-                              } else {
-                                return Text('Imagem indisponível');
-                              }
-                            },
-                          ),
-                        )
-                        .toList(),
-                      ),
+                  child: PageView(
+                    scrollDirection: Axis.horizontal,
+                    children: arquivos
+                      .map(
+                        (arquivo) => FutureBuilder<String>(
+                          future: getArquivoBucketUrl('${widget.postagem.id}/${arquivo.arquivo}'),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('${snapshot.error}');
+                            } else if (snapshot.hasData) {
+                              final imageUrl = snapshot.data!;
+                              return Container(
+                                  height: 300,
+                                  child: FittedBox(
+                                    fit: BoxFit.cover,
+                                    child: Image.network(imageUrl)
+                                  ),
+                                );
+                            } else {
+                              return Text('Imagem indisponível');
+                            }
+                          },
+                        ),
+                      )
+                      .toList(),
                     ),
                 );
             }
