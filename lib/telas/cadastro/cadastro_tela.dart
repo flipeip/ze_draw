@@ -46,60 +46,68 @@ class CadastroTela extends StatelessWidget {
               height: alturaImagens,
             ),
           ),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 112),
-                  GradientText(
-                    'Criar Conta',
-                    colors: const [
-                      Color(0xFFFF2626),
-                      Color(0xFFFFA800),
-                      Color(0xFF34D1DB),
-                    ],
-                    style: const TextStyle(
-                        fontSize: 55, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 32),
-                  CampoTexto(
-                    label: 'Digite seu e-mail',
-                    controlador: controlador.email,
-                    erro: controlador.erroEmail,
-                  ),
-                  // const SizedBox(height: 24),
-                  // const CampoTexto(label: 'Digite um usuário'),
-                  const SizedBox(height: 24),
-                  CampoTexto(
-                    label: 'Digite sua senha',
-                    controlador: controlador.senha,
-                    erro: controlador.erroSenha,
-                    oculto: true,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
-                    child: Text(
-                      'Mínimo de 8 caracteres, incluindo letras, '
-                      'números e símbolos.',
-                      textAlign: TextAlign.center,
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GradientText(
+                      'Criar Conta',
+                      colors: const [
+                        Color(0xFFFF2626),
+                        Color(0xFFFFA800),
+                        Color(0xFF34D1DB),
+                      ],
+                      style: const TextStyle(
+                          fontSize: 55, fontWeight: FontWeight.w600),
                     ),
-                  ),
-                  const SizedBox(height: 0),
-                  CampoTexto(
-                    label: 'Confirme sua senha',
-                    controlador: controlador.senhaRepetir,
-                    erro: controlador.erroSenhaRepetir,
-                    oculto: true,
-                  ),
-                  const SizedBox(height: 24),
-                  BotaoPadrao(
-                    texto: 'Cadastrar-se',
-                    aoClicar: () => controlador.criarConta(context),
-                  ),
-                ],
+                    const SizedBox(height: 32),
+                    CampoTexto(
+                      label: 'Digite seu e-mail',
+                      controlador: controlador.email,
+                      erro: controlador.erroEmail,
+                    ),
+                    // const SizedBox(height: 24),
+                    // const CampoTexto(label: 'Digite um usuário'),
+                    const SizedBox(height: 24),
+                    CampoTexto(
+                      label: 'Digite sua senha',
+                      controlador: controlador.senha,
+                      erro: controlador.erroSenha,
+                      oculto: true,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
+                      child: Text(
+                        'Mínimo de 8 caracteres, incluindo letras, '
+                        'números e símbolos.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 0),
+                    CampoTexto(
+                      label: 'Confirme sua senha',
+                      controlador: controlador.senhaRepetir,
+                      erro: controlador.erroSenhaRepetir,
+                      oculto: true,
+                    ),
+                    const SizedBox(height: 36),
+                    BotaoPadrao(
+                      texto: 'Cadastrar-se',
+                      aoClicar: () => controlador.criarConta(context),
+                    ),
+                    const _Divisor(),
+                    BotaoPadrao(
+                      texto: 'Voltar ao Login',
+                      buttonType: 'lightButton',
+                      aoClicar: () => Navigator.of(context).pop(context),
+                    ),
+                    const SizedBox(height: 112),
+                  ],
+                ),
               ),
             ),
           ),
@@ -137,8 +145,8 @@ class _Divisor extends StatelessWidget {
             child: Text(
               'Ou',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: cor,
-                  ),
+                color: cor,
+              ),
             ),
           ),
           divisor,

@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:badges/badges.dart' as badges;
 import 'package:uuid/uuid.dart';
+import 'package:ze_draw/telas/tela_inicial.dart';
 
 import '../feed/feed_inicial.dart';
 
@@ -229,7 +230,7 @@ class _NovoPostTela extends State<NovoPostTela>{
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => FeedTela()),
+      MaterialPageRoute(builder: (context) => TelaInicial()),
     );
 
   }

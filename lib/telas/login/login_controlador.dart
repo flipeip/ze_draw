@@ -8,8 +8,6 @@ import '../../utilidades/validacoes/email.dart';
 import '../rotas.dart';
 import 'login_tela.dart';
 
-import '../rotas.dart';
-
 class LoginControlador extends StatefulWidget {
   final TextEditingController email = TextEditingController();
   final TextEditingController senha = TextEditingController();
@@ -30,7 +28,7 @@ class LoginControlador extends StatefulWidget {
     try {
       await Autenticacao.logar(email.text, senha.text);
       // TODO: Ir para tela de feed.
-      Navigator.of(context).pushNamed(Rotas.feed);
+      Navigator.of(context).pushNamed(Rotas.telaIncial);
     } on AuthException catch (_) {
       erroSenha.value = 'Login inválido. Verifique o e-mail e a senha.';
     } catch (e) {

@@ -16,7 +16,7 @@ class NovoPerfilControlador extends StatefulWidget {
 
   void createData(BuildContext context) async {
     try {
-      Navigator.of(context).pushNamed(Rotas.feed);
+      Navigator.of(context).pushNamed(Rotas.telaIncial);
       // TODO: Ir para tela de feed.
     } catch (e) {
       log(e.toString());
