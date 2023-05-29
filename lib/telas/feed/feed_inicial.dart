@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ze_draw/api/post/api_arq_post.dart';
+import '../../api/api_perfil.dart';
 import '../../api/autenticacao.dart';
+import '../../api/post/api_comentarios.dart';
 import '../../api/post/api_curtidas.dart';
 import '../rotas.dart';
 import 'package:ze_draw/models/models.dart';
@@ -70,7 +73,9 @@ class PostagemWidget extends StatefulWidget {
 class _PostagemWidgetState extends State<PostagemWidget> {
   DateTime dataAtual = DateTime.now();
 
-  ApiCurtidasPost curtir = ApiCurtidasPost();
+  ApiPost lerPost = ApiPost();
+  ApiArquivoPost lerArquivos = ApiArquivoPost();
+  ApiPerfil lerPerfil = ApiPerfil();
 
   @override
   Widget build(BuildContext context) {
@@ -79,22 +84,18 @@ class _PostagemWidgetState extends State<PostagemWidget> {
         Padding(
           padding: const EdgeInsets.all(20),
           child: FutureBuilder<List<Usuario>>(
-            future: getUsuarioPostagem(widget.postagem.usuario_id),
+            future: lerPost.getUsuarioPostagem(widget.postagem.usuario_id),
             builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
+            if (snapshot.hasError) {
               return Text('${snapshot.error}');
             } else {
               final usuario = snapshot.data ?? null;
               return Row(
               children: [
                 FutureBuilder<String>(
-                  future: getUsuarioBucketUrl('${usuario?[0].foto}'),
+                  future: lerPerfil.getUsuarioBucketUrl('${usuario?[0].foto}'),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
+                    if (snapshot.hasError) {
                       return Text('${snapshot.error}');
                     } else if (snapshot.hasData && usuario?[0].foto != null) {
                       final imageUrl = snapshot.data!;
@@ -132,10 +133,23 @@ class _PostagemWidgetState extends State<PostagemWidget> {
           ),
         ),
         FutureBuilder<List<Arquivo>>(
-          future: getArquivosDaPostagem(widget.postagem.id),
+          future: lerArquivos.getArquivosDaPostagem(widget.postagem.id),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return Container(
+                height: 300,
+                width: MediaQuery.sizeOf(context).width,
+                decoration: const BoxDecoration(
+                  color: Colors.grey,
+                ),
+                child: Center(
+                  child: SizedBox(
+                      width: 25,
+                      height: 25,
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                ),
+              );
             } else if (snapshot.hasError) {
               return Text('${snapshot.error}');
             } else {
@@ -147,7 +161,7 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                     children: arquivos
                       .map(
                         (arquivo) => FutureBuilder<String>(
-                          future: getArquivoBucketUrl('${widget.postagem.id}/${arquivo.arquivo}'),
+                          future: lerArquivos.getArquivoBucketUrl('${widget.postagem.id}/${arquivo.arquivo}'),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const CircularProgressIndicator();
@@ -180,63 +194,128 @@ class _PostagemWidgetState extends State<PostagemWidget> {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-            child: Row(
-              children: [
-                Row(
-                  children: [
-                    FutureBuilder<List<dynamic>>(
-                    future: getCurtidasPostagem(widget.postagem.id),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasData) {
-                        final curtidas = snapshot.data!.length;
-                        var curtido = false;
-                        try {
-                          if ('${Autenticacao.usuario}' == '${snapshot.data![0]['usuario_id']}'){
-                            curtido = true;
-                          }
-                        }catch (error){
-                          curtido = false;
-                        }
-                        return TextButton.icon(
-                          onPressed: () => _curtirPost(widget.postagem.id),
-                          icon: Icon(FontAwesomeIcons.solidStar, color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898)),
-                          label: Text('${curtidas}', style: TextStyle(color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898))),
-                        );
-                      } else {
-                          return Text('Error');
-                        }
-                      },
-                    ),
-                    FutureBuilder<List<dynamic>>(
-                    future: getComentariosPostagem(widget.postagem.id),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        final comentarios = snapshot.data!.length;
-                        return TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
-                          label: Text('${comentarios}', style: TextStyle(color: Color(0xFF989898))),
-                        );
-                      } else {
-                          return Text('Error');
-                        }
-                      },
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(FontAwesomeIcons.share),
-                      color: Color(0xFF989898),
-                    ),
-                  ],
+            child: AcoesWidget(postagem: widget.postagem),
+          ),
+        ),
+      ],
+    );
+  }
+  
+}
+
+class AcoesWidget extends StatefulWidget{
+  final Postagem postagem;
+
+  AcoesWidget({required this.postagem});
+
+  @override
+    State<AcoesWidget> createState() => _AcoesWidgetState();
+  }
+
+  class _AcoesWidgetState extends State<AcoesWidget> {
+
+    ApiCurtidasPost lerCurtida = ApiCurtidasPost();
+    ApiComentariosPost lerComentarios = ApiComentariosPost();
+
+    @override
+    Widget build(BuildContext context) {
+    return Row(
+      children: [
+      FutureBuilder<List<dynamic>>(
+        future: lerCurtida.getCurtidasPostagem(widget.postagem.id),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return TextButton.icon(
+              onPressed: () {},
+              icon: Icon(FontAwesomeIcons.solidStar, color: Color(0xFF989898)),
+              label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+              style: ButtonStyle(
+                overlayColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.black12,
                 ),
-              
-              ],
+              ),
+            );
+          } else if (snapshot.hasData) {
+            final curtidas = snapshot.data!.length;
+            var curtido = false;
+            try {
+              if ('${Autenticacao.usuario}' == '${snapshot.data![0]['usuario_id']}'){
+                curtido = true;
+              }
+            }catch (error){
+              curtido = false;
+            }
+            return TextButton.icon(
+              onPressed: () => _curtirPost(widget.postagem.id),
+              icon: Icon(FontAwesomeIcons.solidStar, color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898)),
+              label: Text('${curtidas}', style: TextStyle(color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898))),
+              style: ButtonStyle(
+                overlayColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.black12,
+                ),
+              ),
+            );
+          } else {
+            return TextButton.icon(
+              onPressed: () => _curtirPost(widget.postagem.id),
+              icon: Icon(FontAwesomeIcons.solidStar, color: Color(0xFF989898)),
+              label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+              style: ButtonStyle(
+                overlayColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.black12,
+                ),
+              ),
+            );
+          }
+          },
+        ),
+        FutureBuilder<List<dynamic>>(
+          future: lerComentarios.getComentariosPostagem(widget.postagem.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return TextButton.icon(
+                onPressed: () {},
+                icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+                style: ButtonStyle(
+                overlayColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.black12,
+                ),
+              ),
+              );
+            } else if (snapshot.hasData) {
+              final comentarios = snapshot.data!.length;
+              return TextButton.icon(
+                onPressed: () {},
+                icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                label: Text('${comentarios}', style: TextStyle(color: Color(0xFF989898))),
+                style: ButtonStyle(
+                overlayColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.black12,
+                ),
+              ),
+              );
+            } else {
+                return TextButton.icon(
+                  onPressed: () {},
+                  icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                  label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+                  style: ButtonStyle(
+                  overlayColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.black12,
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: Icon(FontAwesomeIcons.share),
+          color: Color(0xFF989898),
+          style: ButtonStyle(
+            overlayColor: MaterialStateColor.resolveWith(
+              (states) => Colors.black12,
             ),
           ),
         ),
@@ -244,51 +323,19 @@ class _PostagemWidgetState extends State<PostagemWidget> {
     );
   }
 
-  Future<List<Usuario>> getUsuarioPostagem(int? usuarioId) async {
-    List<dynamic> usuarioPostagem = await api.from('usuario').select().eq('id', usuarioId);
-    return (usuarioPostagem).map((e) => Usuario.fromMap(e)).toList();
-  }
-
-  Future<List<Arquivo>> getArquivosDaPostagem(int? postagemId) async {
-    List<dynamic> arquivosPostagem = await api.from('arquivo').select().eq('postagem', postagemId);
-    return (arquivosPostagem).map((e) => Arquivo.fromMap(e)).toList();
-  }
-
-  Future<String> getArquivoBucketUrl(String arquivo) async {
-    final arquivoBucket = await api.storage.from('arquivos_postagem').getPublicUrl(arquivo);
-    return arquivoBucket as String;
-  }
-
-  Future<String> getUsuarioBucketUrl(String arquivo) async {
-    final usuarioBucket = await api.storage.from('fotos_usuario').getPublicUrl(arquivo);
-    return usuarioBucket as String;
-  }
-
-  Future<List<dynamic>> getCurtidasPostagem(int? postagemId) async {
-    List<dynamic> curtidasPost = await api.from('curtidas').select().eq('postagem_id', postagemId);
-    return curtidasPost;
-  }
-  
-  Future<List<dynamic>> getComentariosPostagem(int? postagemId) async {
-    List<dynamic> comentariosPost = await api.from('comentario').select().eq('postagem', postagemId);
-    return comentariosPost;
-  }
-
-
   Future _curtirPost(postagemId) async {
     int usuario = int.parse(Autenticacao.usuario ?? '');
 
     Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario);
     try {
-      await curtir.createData(curtida);
+      await lerCurtida.createData(curtida);
     } catch(error){
-      await curtir.deleteData('${postagemId}', '${usuario}');
+      await lerCurtida.deleteData('${postagemId}', '${usuario}');
     }
 
     setState(() {
-      getCurtidasPostagem(postagemId);
+      lerCurtida.getCurtidasPostagem(postagemId);
     });
     
   }
-  
 }

@@ -12,4 +12,9 @@ class ApiPost {
         .select('id, titulo, descricao, usuario_id, data_publicacao').order('data_publicacao', ascending: false);
     return res;
   }
+
+  Future<List<Usuario>> getUsuarioPostagem(int? usuarioId) async {
+    List<dynamic> usuarioPostagem = await api.from('usuario').select().eq('id', usuarioId);
+    return (usuarioPostagem).map((e) => Usuario.fromMap(e)).toList();
+  }
 }

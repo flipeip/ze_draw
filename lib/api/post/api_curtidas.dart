@@ -16,4 +16,9 @@ class ApiCurtidasPost {
         .select('usuario_id, postagem_id');
     return res;
   }
+  
+  Future<List<dynamic>> getCurtidasPostagem(int? postagemId) async {
+    List<dynamic> curtidasPost = await api.from('curtidas').select().eq('postagem_id', postagemId);
+    return curtidasPost;
+  }
 }
