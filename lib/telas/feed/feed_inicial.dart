@@ -77,6 +77,28 @@ class _PostagemWidgetState extends State<PostagemWidget> {
   ApiArquivoPost lerArquivos = ApiArquivoPost();
   ApiPerfil lerPerfil = ApiPerfil();
 
+  String formatoHora(Duration duration) {
+    if (duration.inDays > 1) {
+      int dias = duration.inDays;
+      return '${dias} dias atrás';
+    }else if (duration.inDays == 1) {
+      int dias = duration.inDays;
+      return '${dias} dia atrás';
+    } else if (duration.inHours > 1) {
+      int horas = duration.inHours;
+      return '${horas} horas atrás';
+    } else if (duration.inHours == 1) {
+      int horas = duration.inHours;
+      return '${horas} hora atrás';
+    } else if (duration.inHours < 1 && duration.inMinutes > 1 ){
+      int minutos = duration.inMinutes;
+      return '${minutos} minutos atrás';
+    } else {
+      int minutos = duration.inMinutes;
+      return '${minutos} minuto atrás';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -95,8 +117,16 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                 FutureBuilder<String>(
                   future: lerPerfil.getUsuarioBucketUrl('${usuario?[0].foto}'),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        width: 42,
+                        height: 42,
+                        child: Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 197, 197, 197),
+                          borderRadius: BorderRadius.all(Radius.circular(50))
+                        ),
+                      );
                     } else if (snapshot.hasData && usuario?[0].foto != null) {
                       final imageUrl = snapshot.data!;
                       return CircleAvatar(
@@ -121,9 +151,9 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       usuario?[0].nome != null 
-                      ? Text(usuario?[0].nome as String)
+                      ? Text(usuario?[0].nome as String, style: TextStyle(fontWeight: FontWeight.w600),)
                       : Text('nouser'),
-                      Text('${dataAtual.difference(DateTime.parse(widget.postagem.data_publicacao)).inHours} hora(s) atrás'),
+                      Text(formatoHora(dataAtual.difference(DateTime.parse(widget.postagem.data_publicacao))), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),),
                     ],
                   ),
                 )
@@ -216,6 +246,7 @@ class AcoesWidget extends StatefulWidget{
 
     ApiCurtidasPost lerCurtida = ApiCurtidasPost();
     ApiComentariosPost lerComentarios = ApiComentariosPost();
+    final int? usuario = Autenticacao.usuario;
 
     @override
     Widget build(BuildContext context) {
@@ -239,7 +270,8 @@ class AcoesWidget extends StatefulWidget{
             final curtidas = snapshot.data!.length;
             var curtido = false;
             try {
-              if ('${Autenticacao.usuario}' == '${snapshot.data![0]['usuario_id']}'){
+              var usuarios_curtidos = snapshot.data!.map((item) => item['usuario_id']).toList();
+              if (usuarios_curtidos.contains(usuario)){
                 curtido = true;
               }
             }catch (error){
@@ -324,9 +356,9 @@ class AcoesWidget extends StatefulWidget{
   }
 
   Future _curtirPost(postagemId) async {
-    int usuario = int.parse(Autenticacao.usuario ?? '');
+    int? usuario = Autenticacao.usuario;
 
-    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario);
+    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario!);
     try {
       await lerCurtida.createData(curtida);
     } catch(error){

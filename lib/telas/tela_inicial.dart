@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ze_draw/telas/rotas.dart';
+import '../api/autenticacao.dart';
 import 'feed/feed_inicial.dart';
+import 'perfil/perfil_tela.dart';
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({super.key});
@@ -11,7 +13,6 @@ class TelaInicial extends StatefulWidget {
 }
 
 class _TelaInicialState extends State<TelaInicial> {
-
   int _indexAtual = 2;
 
   List<Widget> _telas = [
@@ -19,7 +20,7 @@ class _TelaInicialState extends State<TelaInicial> {
     FeedTela(),
     FeedTela(),
     FeedTela(),
-    FeedTela(),
+    PerfilTela(),
   ];
 
   void _onTabTapped(int index) {
@@ -31,6 +32,7 @@ class _TelaInicialState extends State<TelaInicial> {
 
   @override
   Widget build(BuildContext context) {
+    Autenticacao.getUsuario();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

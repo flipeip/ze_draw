@@ -8,7 +8,6 @@ import 'utilidades/tema.dart';
 
 void main() async {
   await iniciarDependencias();
-  await Autenticacao.getUsuario();
   runApp(const MainApp());
 }
 

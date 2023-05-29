@@ -32,7 +32,7 @@ class _NovoPerfilTela extends State<NovoPerfilTela>{
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
-      allowedExtensions: ['jpg', 'pdf', 'doc'],
+      allowedExtensions: ['jpg', 'png', 'jpeg'],
     );
 
     if (result != null && result.files.isNotEmpty) {
@@ -134,43 +134,43 @@ class _NovoPerfilTela extends State<NovoPerfilTela>{
                                 ),
                               ),
                           ),
-                            const SizedBox(height: 18),
-                            CampoTexto(
-                              label: 'Usuário',
-                              controlador: controlador.usuario,
-                            ),
-                            const SizedBox(height: 24),
-                            CampoTexto(
-                              label: 'Nome',
-                              controlador: controlador.nome,
-                            ),
-                            const SizedBox(height: 24),
-                            CampoTexto(
-                              label: 'Celular',
-                              controlador: controlador.celular,
-                            ),
-                            const SizedBox(height: 24),
-                            CampoTexto(
-                              label: 'Data Nascimento',
-                              controlador: controlador.dataNascimento,
-                            ),
-                            const SizedBox(height: 24),
-                            BotaoPadrao(
-                              texto: 'Salvar Perfil',
-                              aoClicar: _createData,
-                            ),
-                            const SizedBox(height: 32),
-                            BotaoPadrao(
-                              texto: 'Continuar sem perfil',
-                              aoClicar: _createWithNoData,
-                              buttonType: 'lightButton',
-                            ),
-                          ],
-                        ),
+                          const SizedBox(height: 18),
+                          CampoTexto(
+                            label: 'Usuário',
+                            controlador: controlador.usuario,
+                          ),
+                          const SizedBox(height: 24),
+                          CampoTexto(
+                            label: 'Nome',
+                            controlador: controlador.nome,
+                          ),
+                          const SizedBox(height: 24),
+                          CampoTexto(
+                            label: 'Celular',
+                            controlador: controlador.celular,
+                          ),
+                          const SizedBox(height: 24),
+                          CampoTexto(
+                            label: 'Data Nascimento',
+                            controlador: controlador.dataNascimento,
+                          ),
+                          const SizedBox(height: 24),
+                          BotaoPadrao(
+                            texto: 'Salvar Perfil',
+                            aoClicar: _createData,
+                          ),
+                          const SizedBox(height: 32),
+                          BotaoPadrao(
+                            texto: 'Continuar sem perfil',
+                            aoClicar: _createWithNoData,
+                            buttonType: 'lightButton',
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  ],
+                ),
+                ],
                 ),
               ),
             ],

@@ -20,7 +20,7 @@ class Autenticacao {
 
   static get sessao => api.auth.currentSession;
 
-  static String? usuario;
+  static int? usuario;
 
   static Future<void> getUsuario() async {
     List<dynamic> res = await api.from('usuario').select('id').eq('user_id', api.auth.currentUser?.id);

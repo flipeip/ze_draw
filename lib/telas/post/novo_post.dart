@@ -56,19 +56,23 @@ class _NovoPostTela extends State<NovoPostTela>{
     });
   }
 
-  bool _isBadgeTapped = false;
+  bool _isBadgeTapped = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const CampoPesquisa(label: 'Pesquisar'),
-        actions: [
-          IconButton(onPressed: (){}, icon: const Icon(FontAwesomeIcons.ellipsisVertical), color: const Color(0xFF679C8A)),
-        ],
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop(context);
+          },
+        ),
+        title: const Text('Feed Inicial', style: TextStyle(fontSize: 18, color: Color(0xFF679C8A), fontWeight: FontWeight.w500)),
         shadowColor: Colors.black12,
         elevation: 10,
         surfaceTintColor: Colors.white,
+        iconTheme: IconThemeData(color: Color(0xFF679C8A)),
       ),
       body: Column(
         children:[
@@ -206,9 +210,9 @@ class _NovoPostTela extends State<NovoPostTela>{
 
 
   Future _createData() async {
-    int usuario = int.parse(Autenticacao.usuario ?? '');
+    int? usuario = Autenticacao.usuario;
 
-    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario);
+    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario!);
   
     List<dynamic> res = await criarPost.createData(postagem);
 

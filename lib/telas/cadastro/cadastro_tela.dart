@@ -14,7 +14,7 @@ class CadastroTela extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const alturaImagens = 150.0;
+    const alturaImagens = 100.0;
     return Scaffold(
       body: Stack(
         children: [
@@ -62,9 +62,9 @@ class CadastroTela extends StatelessWidget {
                         Color(0xFF34D1DB),
                       ],
                       style: const TextStyle(
-                          fontSize: 55, fontWeight: FontWeight.w600),
+                          fontSize: 50, fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
                     CampoTexto(
                       label: 'Digite seu e-mail',
                       controlador: controlador.email,
@@ -85,16 +85,16 @@ class CadastroTela extends StatelessWidget {
                         'Mínimo de 8 caracteres, incluindo letras, '
                         'números e símbolos.',
                         textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.orange, fontSize: 12),
                       ),
                     ),
-                    const SizedBox(height: 0),
                     CampoTexto(
                       label: 'Confirme sua senha',
                       controlador: controlador.senhaRepetir,
                       erro: controlador.erroSenhaRepetir,
                       oculto: true,
                     ),
-                    const SizedBox(height: 36),
+                    const SizedBox(height: 28),
                     BotaoPadrao(
                       texto: 'Cadastrar-se',
                       aoClicar: () => controlador.criarConta(context),
@@ -105,7 +105,6 @@ class CadastroTela extends StatelessWidget {
                       buttonType: 'lightButton',
                       aoClicar: () => Navigator.of(context).pop(context),
                     ),
-                    const SizedBox(height: 112),
                   ],
                 ),
               ),
@@ -136,7 +135,7 @@ class _Divisor extends StatelessWidget {
     final divisor = Expanded(child: Divider(color: cor));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 18),
       child: Row(
         children: [
           divisor,

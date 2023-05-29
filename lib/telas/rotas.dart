@@ -7,6 +7,7 @@ import 'cadastro/cadastro_controlador.dart';
 import 'feed/feed_inicial.dart';
 import 'login/login_controlador.dart';
 import 'perfil/perfil_novo.dart';
+import 'perfil/perfil_tela.dart';
 import 'post/novo_post.dart';
 
 class Rotas {
@@ -16,6 +17,7 @@ class Rotas {
   static const feed = '/feed';
   static const novoPost = '/novo_post';
   static const novoPerfil = '/novo_perfil';
+  static const perfil = '/perfil';
 
   static Map<String, Widget Function(BuildContext)> get rotas {
     return {
@@ -25,6 +27,7 @@ class Rotas {
       cadastro: (_) => CadastroControlador(),
       novoPost: (_) => const NovoPostTela(),
       novoPerfil: (_) => const NovoPerfilTela(),
+      perfil: (_) => const PerfilTela(),
     };
   }
 }
