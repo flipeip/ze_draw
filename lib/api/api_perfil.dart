@@ -12,4 +12,9 @@ class ApiPerfil {
         .select('id, nome, usuario, celular, usuario_id, data_nascimento');
     return res;
   }
+
+  Future<String> getUsuarioBucketUrl(String arquivo) async {
+    final usuarioBucket = await api.storage.from('fotos_usuario').getPublicUrl(arquivo);
+    return usuarioBucket as String;
+  }
 }
