@@ -5,29 +5,29 @@ class Postagem {
   final int? id;
   final String titulo;
   final String descricao;
-  late final int usuario_id;
-  final String data_publicacao;
+  late final int usuarioId;
+  final String dataPublicacao;
   Postagem({
     this.id,
     required this.titulo,
     required this.descricao,
-    required this.usuario_id,
-    required this.data_publicacao,
+    required this.usuarioId,
+    required this.dataPublicacao,
   });
 
   Postagem copyWith({
     int? id,
     String? titulo,
     String? descricao,
-    int? usuario_id,
-    String? data_publicacao,
+    int? usuarioId,
+    String? dataPublicacao,
   }) {
     return Postagem(
       id: id ?? this.id,
       titulo: titulo ?? this.titulo,
       descricao: descricao ?? this.descricao,
-      usuario_id: usuario_id ?? this.usuario_id,
-      data_publicacao: data_publicacao ?? this.data_publicacao,
+      usuarioId: usuarioId ?? this.usuarioId,
+      dataPublicacao: dataPublicacao ?? this.dataPublicacao,
     );
   }
 
@@ -36,8 +36,8 @@ class Postagem {
       'id': id,
       'titulo': titulo,
       'descricao': descricao,
-      'usuario_id': usuario_id,
-      'data_publicacao': data_publicacao,
+      'usuario_id': usuarioId,
+      'data_publicacao': dataPublicacao,
     };
   }
 
@@ -46,8 +46,8 @@ class Postagem {
       id: map['id'] != null ? map['id'] as int : null,
       titulo: map['titulo'] as String,
       descricao: map['descricao'] as String,
-      usuario_id: map['usuario_id'] as int,
-      data_publicacao: map['data_publicacao'] as String,
+      usuarioId: map['usuario_id'] as int,
+      dataPublicacao: map['data_publicacao'] as String,
     );
   }
 
@@ -57,7 +57,7 @@ class Postagem {
 
   @override
   String toString() {
-    return 'Postagem(id: $id, titulo: $titulo, descricao: $descricao, usuario_id: $usuario_id, data_publicacao: $data_publicacao)';
+    return 'Postagem(id: $id, titulo: $titulo, descricao: $descricao, usuario_id: $usuarioId, data_publicacao: $dataPublicacao)';
   }
 
   @override
@@ -68,8 +68,8 @@ class Postagem {
       other.id == id &&
       other.titulo == titulo &&
       other.descricao == descricao &&
-      other.usuario_id == usuario_id &&
-      other.data_publicacao == data_publicacao;
+      other.usuarioId == usuarioId &&
+      other.dataPublicacao == dataPublicacao;
   }
 
   @override
@@ -77,7 +77,7 @@ class Postagem {
     return id.hashCode ^
       titulo.hashCode ^
       descricao.hashCode ^
-      usuario_id.hashCode ^
-      data_publicacao.hashCode;
+      usuarioId.hashCode ^
+      dataPublicacao.hashCode;
   }
 }

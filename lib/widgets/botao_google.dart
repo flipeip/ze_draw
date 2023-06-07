@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EntrarComGoogle extends StatelessWidget {
-  const EntrarComGoogle();
+  const EntrarComGoogle({super.key});
 
   @override
   Widget build(BuildContext context) {

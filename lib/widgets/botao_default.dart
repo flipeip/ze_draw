@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class BotaoPadrao extends StatelessWidget {
   final String texto;
@@ -22,7 +21,7 @@ class BotaoPadrao extends StatelessWidget {
       return Container(
         decoration: BoxDecoration(
           borderRadius: borderRadius,
-          border: GradientBoxBorder(
+          border: const GradientBoxBorder(
             gradient: LinearGradient(colors: [
               Colors.redAccent,
               Colors.orange,

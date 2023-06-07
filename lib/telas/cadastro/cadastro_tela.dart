@@ -14,7 +14,7 @@ class CadastroTela extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const alturaImagens = 100.0;
+    var alturaImagens = MediaQuery.of(context).size.width * 0.32;
     return Scaffold(
       body: Stack(
         children: [

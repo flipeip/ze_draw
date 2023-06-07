@@ -4,22 +4,22 @@ import 'dart:convert';
 class PostagemCreate {
   final String titulo;
   final String descricao;
-  final int usuario_id;
+  final int usuarioId;
   PostagemCreate({
     required this.titulo,
     required this.descricao,
-    required this.usuario_id,
+    required this.usuarioId,
   });
 
   PostagemCreate copyWith({
     String? titulo,
     String? descricao,
-    int? usuario_id,
+    int? usuarioId,
   }) {
     return PostagemCreate(
       titulo: titulo ?? this.titulo,
       descricao: descricao ?? this.descricao,
-      usuario_id: usuario_id ?? this.usuario_id,
+      usuarioId: usuarioId ?? this.usuarioId,
     );
   }
 
@@ -27,7 +27,7 @@ class PostagemCreate {
     return <String, dynamic>{
       'titulo': titulo,
       'descricao': descricao,
-      'usuario_id': usuario_id,
+      'usuario_id': usuarioId,
     };
   }
 
@@ -35,7 +35,7 @@ class PostagemCreate {
     return PostagemCreate(
       titulo: map['titulo'] as String,
       descricao: map['descricao'] as String,
-      usuario_id: map['usuario_id'] as int,
+      usuarioId: map['usuario_id'] as int,
     );
   }
 
@@ -44,7 +44,7 @@ class PostagemCreate {
   factory PostagemCreate.fromJson(String source) => PostagemCreate.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'PostagemCreate(titulo: $titulo, descricao: $descricao, usuario_id: $usuario_id)';
+  String toString() => 'PostagemCreate(titulo: $titulo, descricao: $descricao, usuario_id: $usuarioId)';
 
   @override
   bool operator ==(covariant PostagemCreate other) {
@@ -53,9 +53,9 @@ class PostagemCreate {
     return 
       other.titulo == titulo &&
       other.descricao == descricao &&
-      other.usuario_id == usuario_id;
+      other.usuarioId == usuarioId;
   }
 
   @override
-  int get hashCode => titulo.hashCode ^ descricao.hashCode ^ usuario_id.hashCode;
+  int get hashCode => titulo.hashCode ^ descricao.hashCode ^ usuarioId.hashCode;
 }

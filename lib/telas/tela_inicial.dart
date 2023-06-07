@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:ze_draw/telas/rotas.dart';
 import '../api/autenticacao.dart';
 import 'feed/feed_inicial.dart';
 import 'perfil/perfil_tela.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({super.key});
@@ -13,117 +13,70 @@ class TelaInicial extends StatefulWidget {
 }
 
 class _TelaInicialState extends State<TelaInicial> {
-  int _indexAtual = 2;
+  final PersistentTabController _controller = PersistentTabController(initialIndex: 2);
 
-  List<Widget> _telas = [
-    FeedTela(),
-    FeedTela(),
-    FeedTela(),
-    FeedTela(),
-    PerfilTela(),
-  ];
+  List<Widget> _buildScreens() {
+    return [
+      const FeedTela(),
+      const FeedTela(),
+      const FeedTela(),
+      const FeedTela(),
+      PerfilTela(usuario: Autenticacao.usuario)
+    ];
+  }
 
-  void _onTabTapped(int index) {
-    setState(() {
-      _indexAtual = index;
-    });
+  List<PersistentBottomNavBarItem> _navBarsItems() {
+      return [
+        PersistentBottomNavBarItem(
+            icon: const Icon(FontAwesomeIcons.calendar),
+            activeColorPrimary: const Color(0xFF679C8A),
+            inactiveColorPrimary: const Color(0xffA3A3A3),
+        ),
+         PersistentBottomNavBarItem(
+            icon: const Icon(FontAwesomeIcons.userGroup),
+            activeColorPrimary: const Color(0xFF679C8A),
+            inactiveColorPrimary: const Color(0xffA3A3A3),
+        ),
+         PersistentBottomNavBarItem(
+            icon: const Icon(FontAwesomeIcons.houseChimney),
+            activeColorPrimary: const Color(0xFF679C8A),
+            inactiveColorPrimary: const Color(0xffA3A3A3),
+        ),
+         PersistentBottomNavBarItem(
+            icon: const Icon(FontAwesomeIcons.solidBell),
+            activeColorPrimary: const Color(0xFF679C8A),
+            inactiveColorPrimary: const Color(0xffA3A3A3),
+        ),
+         PersistentBottomNavBarItem(
+            icon: const Icon(FontAwesomeIcons.solidCircleUser),
+            activeColorPrimary: const Color(0xFF679C8A),
+            inactiveColorPrimary: const Color(0xffA3A3A3),
+        ),
+      ];
   }
 
 
   @override
   Widget build(BuildContext context) {
-    Autenticacao.getUsuario();
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pushNamed(Rotas.login);
-          },
+    return PersistentTabView(
+        context,
+        controller: _controller,
+        screens: _buildScreens(),
+        items: _navBarsItems(),
+        navBarHeight: 70,
+        confineInSafeArea: true,
+        decoration: NavBarDecoration(
+          colorBehindNavBar: Colors.white,
+          border: Border.all(color: const Color(0xffA3A3A3), width: 0.3),
         ),
-        title: const Text('Feed Inicial', style: TextStyle(fontSize: 18, color: Color(0xFF679C8A), fontWeight: FontWeight.w500)),
-        shadowColor: Colors.black12,
-        elevation: 10,
-        surfaceTintColor: Colors.white,
-        iconTheme: IconThemeData(color: Color(0xFF679C8A)),
-      ),
-      body: _telas[_indexAtual],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _indexAtual,
-        onTap: _onTabTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: _indexAtual == 0 ?
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                color: Color(0xFFD9F4EB),
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Icon(FontAwesomeIcons.calendar)
-            )
-            : Icon(FontAwesomeIcons.calendar),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _indexAtual == 1 ?
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                color: Color(0xFFD9F4EB),
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Icon(FontAwesomeIcons.userGroup)
-            )
-            : Icon(FontAwesomeIcons.userGroup),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _indexAtual == 2 ?
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                color: Color(0xFFD9F4EB),
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Icon(FontAwesomeIcons.houseChimney)
-            )
-            : Icon(FontAwesomeIcons.houseChimney),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _indexAtual == 3 ?
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                color: Color(0xFFD9F4EB),
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Icon(FontAwesomeIcons.solidBell)
-            )
-            : Icon(FontAwesomeIcons.solidBell),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: _indexAtual == 4 ?
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              decoration: BoxDecoration(
-                color: Color(0xFFD9F4EB),
-                borderRadius: BorderRadius.circular(10)
-              ),
-              child: Icon(FontAwesomeIcons.solidCircleUser)
-            )
-            : Icon(FontAwesomeIcons.solidCircleUser),
-            label: '',
-          ),
-        ],
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        unselectedItemColor: Color(0xffA3A3A3),
-        selectedItemColor: Color(0xFF679C8A),
-        type: BottomNavigationBarType.fixed,
-      ),
+        popAllScreensOnTapOfSelectedTab: true,
+        popActionScreens: PopActionScreensType.all,
+        itemAnimationProperties: const ItemAnimationProperties(
+          duration: Duration(milliseconds: 200),
+          curve: Curves.ease,
+        ),
+        navBarStyle: NavBarStyle.style1,
+        
     );
   }
 }

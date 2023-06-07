@@ -14,7 +14,7 @@ class ApiComentariosPost {
   }
 
   Future<List<dynamic>> getComentariosPostagem(int? postagemId) async {
-    List<dynamic> comentariosPost = await api.from('comentario').select().eq('postagem', postagemId);
+    List<dynamic> comentariosPost = await api.from('comentario').select('usuario_id, postagem, comentario').eq('postagem', postagemId);
     return comentariosPost;
   }
 }
