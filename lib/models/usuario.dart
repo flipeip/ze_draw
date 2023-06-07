@@ -6,17 +6,19 @@ class Usuario {
   final String? foto;
   final bool? status;
   final String? celular;
-  final String user_id;
-  final String? data_nascimento;
+  final String userId;
+  final String? dataNascimento;
   final String? usuario;
+  final String? capa;
   Usuario({
     this.nome,
     this.foto,
     this.status,
     this.celular,
-    required this.user_id,
-    this.data_nascimento,
+    required this.userId,
+    this.dataNascimento,
     this.usuario,
+    this.capa,
   });
 
   Usuario copyWith({
@@ -24,18 +26,20 @@ class Usuario {
     String? foto,
     bool? status,
     String? celular,
-    String? user_id,
-    String? data_nascimento,
+    String? userId,
+    String? dataNascimento,
     String? usuario,
+    String? capa,
   }) {
     return Usuario(
       nome: nome ?? this.nome,
       foto: foto ?? this.foto,
       status: status ?? this.status,
       celular: celular ?? this.celular,
-      user_id: user_id ?? this.user_id,
-      data_nascimento: data_nascimento ?? this.data_nascimento,
+      userId: userId ?? this.userId,
+      dataNascimento: dataNascimento ?? this.dataNascimento,
       usuario: usuario ?? this.usuario,
+      capa: capa ?? this.capa,
     );
   }
 
@@ -45,9 +49,10 @@ class Usuario {
       'foto': foto,
       'status': status,
       'celular': celular,
-      'user_id': user_id,
-      'data_nascimento': data_nascimento,
+      'user_id': userId,
+      'data_nascimento': dataNascimento,
       'usuario': usuario,
+      'capa': capa,
     };
   }
 
@@ -57,9 +62,10 @@ class Usuario {
       foto: map['foto'] != null ? map['foto'] as String : null,
       status: map['status'] != null ? map['status'] as bool : null,
       celular: map['celular'] != null ? map['celular'] as String : null,
-      user_id: map['user_id'] as String,
-      data_nascimento: map['data_nascimento'] != null ? map['data_nascimento'] as String : null,
+      userId: map['user_id'] as String,
+      dataNascimento: map['data_nascimento'] != null ? map['data_nascimento'] as String : null,
       usuario: map['usuario'] != null ? map['usuario'] as String : null,
+      capa: map['capa'] != null ? map['capa'] as String : null,
     );
   }
 
@@ -69,7 +75,7 @@ class Usuario {
 
   @override
   String toString() {
-    return 'Usuario(nome: $nome, foto: $foto, status: $status, celular: $celular, user_id: $user_id, data_nascimento: $data_nascimento, usuario: $usuario)';
+    return 'Usuario(nome: $nome, foto: $foto, status: $status, celular: $celular, user_id: $userId, data_nascimento: $dataNascimento, usuario: $usuario, capa: $capa)';
   }
 
   @override
@@ -81,9 +87,10 @@ class Usuario {
       other.foto == foto &&
       other.status == status &&
       other.celular == celular &&
-      other.user_id == user_id &&
-      other.data_nascimento == data_nascimento &&
-      other.usuario == usuario;
+      other.userId == userId &&
+      other.dataNascimento == dataNascimento &&
+      other.usuario == usuario &&
+      other.capa == capa;
   }
 
   @override
@@ -92,8 +99,9 @@ class Usuario {
       foto.hashCode ^
       status.hashCode ^
       celular.hashCode ^
-      user_id.hashCode ^
-      data_nascimento.hashCode ^
-      usuario.hashCode;
+      userId.hashCode ^
+      dataNascimento.hashCode ^
+      usuario.hashCode ^
+      capa.hashCode;
   }
 }

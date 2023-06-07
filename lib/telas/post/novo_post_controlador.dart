@@ -10,11 +10,12 @@ class NovoPostControlador extends StatefulWidget {
 
   NovoPostControlador({super.key});
 
+  @override
   State<NovoPostControlador> createState() => _NovoPostControladorState();
 
   void createData(BuildContext context) async {
     try {
-      Navigator.of(context).pushNamed(Rotas.telaIncial);
+      Navigator.of(context).pushNamed(Rotas.feed);
       // TODO: Ir para tela de feed.
     } catch (e) {
       log(e.toString());

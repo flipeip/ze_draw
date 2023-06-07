@@ -1,13 +1,18 @@
+// ignore_for_file: sort_child_properties_last
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:ze_draw/api/post/api_arq_post.dart';
+import 'package:ze_draw/telas/feed/post_aberto.dart';
+import 'package:ze_draw/telas/perfil/perfil_tela.dart';
+import 'package:ze_draw/telas/post/novo_post.dart';
+import 'package:ze_draw/widgets/app_bar_default.dart';
 import '../../api/api_perfil.dart';
 import '../../api/autenticacao.dart';
 import '../../api/post/api_comentarios.dart';
 import '../../api/post/api_curtidas.dart';
-import '../rotas.dart';
 import 'package:ze_draw/models/models.dart';
-import '../../api/api.dart';
 import '../../api/post/api_post.dart';
 
 class FeedTela extends StatelessWidget {
@@ -24,6 +29,7 @@ class FeedTela extends StatelessWidget {
     }
 
     return Scaffold(
+      appBar: const AppBarDefault(),
       body: FutureBuilder(
         future: readData(),
         builder: ((context, snapshot) {
@@ -38,24 +44,29 @@ class FeedTela extends StatelessWidget {
               }
             ));
           }
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A),));
         }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.of(context).pushNamed(Rotas.novoPost);
+          PersistentNavBarNavigator.pushNewScreen(
+              context,
+              screen: const NovoPostTela(),
+              withNavBar: false,
+              pageTransitionAnimation: PageTransitionAnimation.cupertino,
+          );
         },
         child: 
           Container(
             width: 60,
             height: 60,
             child: const Icon(FontAwesomeIcons.paintbrush, color: Colors.white,),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(colors: [Color(0XFFFF2626), Color(0XFFFFA800), Color(0XFF34D1DB)]),
             ),
           ),
-          shape: CircleBorder(),
+          shape: const CircleBorder(),
         ),
     );
   }
@@ -64,7 +75,7 @@ class FeedTela extends StatelessWidget {
 class PostagemWidget extends StatefulWidget {
   final Postagem postagem;
 
-  PostagemWidget({required this.postagem});
+  const PostagemWidget({super.key, required this.postagem});
 
   @override
   State<PostagemWidget> createState() => _PostagemWidgetState();
@@ -77,6 +88,28 @@ class _PostagemWidgetState extends State<PostagemWidget> {
   ApiArquivoPost lerArquivos = ApiArquivoPost();
   ApiPerfil lerPerfil = ApiPerfil();
 
+  String formatoHora(Duration duration) {
+    if (duration.inDays > 1) {
+      int dias = duration.inDays;
+      return '$dias dias atrás';
+    }else if (duration.inDays == 1) {
+      int dias = duration.inDays;
+      return '$dias dia atrás';
+    } else if (duration.inHours > 1) {
+      int horas = duration.inHours;
+      return '$horas horas atrás';
+    } else if (duration.inHours == 1) {
+      int horas = duration.inHours;
+      return '$horas hora atrás';
+    } else if (duration.inHours < 1 && duration.inMinutes > 1 ){
+      int minutos = duration.inMinutes;
+      return '$minutos minutos atrás';
+    } else {
+      int minutos = duration.inMinutes;
+      return '$minutos minuto atrás';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -84,30 +117,48 @@ class _PostagemWidgetState extends State<PostagemWidget> {
         Padding(
           padding: const EdgeInsets.all(20),
           child: FutureBuilder<List<Usuario>>(
-            future: lerPost.getUsuarioPostagem(widget.postagem.usuario_id),
+            future: lerPost.getUsuarioPostagem(widget.postagem.usuarioId),
             builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('${snapshot.error}');
             } else {
-              final usuario = snapshot.data ?? null;
+              final usuario = snapshot.data;
               return Row(
               children: [
                 FutureBuilder<String>(
                   future: lerPerfil.getUsuarioBucketUrl('${usuario?[0].foto}'),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        width: 42,
+                        height: 42,
+                        child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 197, 197, 197),
+                          borderRadius: BorderRadius.all(Radius.circular(50))
+                        ),
+                      );
                     } else if (snapshot.hasData && usuario?[0].foto != null) {
                       final imageUrl = snapshot.data!;
-                      return CircleAvatar(
-                        backgroundImage: Image.network(imageUrl).image,
+                      return GestureDetector(
+                        onTap: (){
+                           PersistentNavBarNavigator.pushNewScreen(
+                              context,
+                              screen: PerfilTela(usuario: widget.postagem.usuarioId),
+                              withNavBar: true,
+                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                          );
+                        },
+                        child: CircleAvatar(
+                          backgroundImage: Image.network(imageUrl).image,
+                        ),
                       );
                     } else {
                       return Container(
                         width: 42,
                         height: 42,
-                        child: Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
-                        decoration: BoxDecoration(
+                        child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                        decoration: const BoxDecoration(
                           color: Color.fromARGB(255, 197, 197, 197),
                           borderRadius: BorderRadius.all(Radius.circular(50))
                         ),
@@ -121,9 +172,9 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       usuario?[0].nome != null 
-                      ? Text(usuario?[0].nome as String)
-                      : Text('nouser'),
-                      Text('${dataAtual.difference(DateTime.parse(widget.postagem.data_publicacao)).inHours} hora(s) atrás'),
+                      ? Text(usuario?[0].nome as String, style: const TextStyle(fontWeight: FontWeight.w600),)
+                      : const Text('...'),
+                      Text(formatoHora(dataAtual.difference(DateTime.parse(widget.postagem.dataPublicacao))), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200),),
                     ],
                   ),
                 )
@@ -142,7 +193,7 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                 decoration: const BoxDecoration(
                   color: Colors.grey,
                 ),
-                child: Center(
+                child: const Center(
                   child: SizedBox(
                       width: 25,
                       height: 25,
@@ -169,15 +220,25 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                               return Text('${snapshot.error}');
                             } else if (snapshot.hasData) {
                               final imageUrl = snapshot.data!;
-                              return SizedBox(
-                                  height: 300,
-                                  child: FittedBox(
-                                    fit: BoxFit.cover,
-                                    child: Image.network(imageUrl)
+                              return GestureDetector(
+                                onTap: (){
+                                  PersistentNavBarNavigator.pushNewScreen(
+                                      context,
+                                      screen: PostAbertoTela(post: widget.postagem.id),
+                                      withNavBar: true,
+                                      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                                  );
+                                },
+                                child: SizedBox(
+                                    height: 300,
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: Image.network(imageUrl)
+                                    ),
                                   ),
-                                );
+                              );
                             } else {
-                              return Text('Imagem indisponível');
+                              return const Text('Imagem indisponível');
                             }
                           },
                         ),
@@ -189,8 +250,8 @@ class _PostagemWidgetState extends State<PostagemWidget> {
           },
         ),
         Container(
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 1, color: const Color.fromARGB(255, 218, 218, 218)))
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(width: 1, color: Color.fromARGB(255, 218, 218, 218)))
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
@@ -206,7 +267,7 @@ class _PostagemWidgetState extends State<PostagemWidget> {
 class AcoesWidget extends StatefulWidget{
   final Postagem postagem;
 
-  AcoesWidget({required this.postagem});
+  const AcoesWidget({super.key, required this.postagem});
 
   @override
     State<AcoesWidget> createState() => _AcoesWidgetState();
@@ -216,6 +277,7 @@ class AcoesWidget extends StatefulWidget{
 
     ApiCurtidasPost lerCurtida = ApiCurtidasPost();
     ApiComentariosPost lerComentarios = ApiComentariosPost();
+    final int? usuario = Autenticacao.usuario;
 
     @override
     Widget build(BuildContext context) {
@@ -227,8 +289,8 @@ class AcoesWidget extends StatefulWidget{
           if (snapshot.hasError) {
             return TextButton.icon(
               onPressed: () {},
-              icon: Icon(FontAwesomeIcons.solidStar, color: Color(0xFF989898)),
-              label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+              icon: const Icon(FontAwesomeIcons.solidStar, color: Color(0xFF989898)),
+              label: const Text('0', style: TextStyle(color: Color(0xFF989898))),
               style: ButtonStyle(
                 overlayColor: MaterialStateColor.resolveWith(
                   (states) => Colors.black12,
@@ -239,7 +301,8 @@ class AcoesWidget extends StatefulWidget{
             final curtidas = snapshot.data!.length;
             var curtido = false;
             try {
-              if ('${Autenticacao.usuario}' == '${snapshot.data![0]['usuario_id']}'){
+              var usuariosCurtidos = snapshot.data!.map((item) => item['usuario_id']).toList();
+              if (usuariosCurtidos.contains(usuario)){
                 curtido = true;
               }
             }catch (error){
@@ -247,8 +310,8 @@ class AcoesWidget extends StatefulWidget{
             }
             return TextButton.icon(
               onPressed: () => _curtirPost(widget.postagem.id),
-              icon: Icon(FontAwesomeIcons.solidStar, color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898)),
-              label: Text('${curtidas}', style: TextStyle(color: curtido == true ? Color(0xFF679C8A): Color(0xFF989898))),
+              icon: Icon(FontAwesomeIcons.solidStar, color: curtido == true ? const Color(0xFF679C8A): const Color(0xFF989898)),
+              label: Text('$curtidas', style: TextStyle(color: curtido == true ? const Color(0xFF679C8A): const Color(0xFF989898))),
               style: ButtonStyle(
                 overlayColor: MaterialStateColor.resolveWith(
                   (states) => Colors.black12,
@@ -258,8 +321,8 @@ class AcoesWidget extends StatefulWidget{
           } else {
             return TextButton.icon(
               onPressed: () => _curtirPost(widget.postagem.id),
-              icon: Icon(FontAwesomeIcons.solidStar, color: Color(0xFF989898)),
-              label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+              icon: const Icon(FontAwesomeIcons.solidStar, color: Color(0xFF989898)),
+              label: const Text('0', style: TextStyle(color: Color(0xFF989898))),
               style: ButtonStyle(
                 overlayColor: MaterialStateColor.resolveWith(
                   (states) => Colors.black12,
@@ -275,8 +338,8 @@ class AcoesWidget extends StatefulWidget{
             if (snapshot.hasError) {
               return TextButton.icon(
                 onPressed: () {},
-                icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
-                label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+                icon: const Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                label: const Text('0', style: TextStyle(color: Color(0xFF989898))),
                 style: ButtonStyle(
                 overlayColor: MaterialStateColor.resolveWith(
                   (states) => Colors.black12,
@@ -287,8 +350,8 @@ class AcoesWidget extends StatefulWidget{
               final comentarios = snapshot.data!.length;
               return TextButton.icon(
                 onPressed: () {},
-                icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
-                label: Text('${comentarios}', style: TextStyle(color: Color(0xFF989898))),
+                icon: const Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                label: Text('$comentarios', style: const TextStyle(color: Color(0xFF989898))),
                 style: ButtonStyle(
                 overlayColor: MaterialStateColor.resolveWith(
                   (states) => Colors.black12,
@@ -298,8 +361,8 @@ class AcoesWidget extends StatefulWidget{
             } else {
                 return TextButton.icon(
                   onPressed: () {},
-                  icon: Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
-                  label: Text('0', style: TextStyle(color: Color(0xFF989898))),
+                  icon: const Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
+                  label: const Text('0', style: TextStyle(color: Color(0xFF989898))),
                   style: ButtonStyle(
                   overlayColor: MaterialStateColor.resolveWith(
                     (states) => Colors.black12,
@@ -311,8 +374,8 @@ class AcoesWidget extends StatefulWidget{
         ),
         IconButton(
           onPressed: () {},
-          icon: Icon(FontAwesomeIcons.share),
-          color: Color(0xFF989898),
+          icon: const Icon(FontAwesomeIcons.share),
+          color: const Color(0xFF989898),
           style: ButtonStyle(
             overlayColor: MaterialStateColor.resolveWith(
               (states) => Colors.black12,
@@ -324,13 +387,13 @@ class AcoesWidget extends StatefulWidget{
   }
 
   Future _curtirPost(postagemId) async {
-    int usuario = int.parse(Autenticacao.usuario ?? '');
+    int? usuario = Autenticacao.usuario;
 
-    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario);
+    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario!);
     try {
       await lerCurtida.createData(curtida);
     } catch(error){
-      await lerCurtida.deleteData('${postagemId}', '${usuario}');
+      await lerCurtida.deleteData('$postagemId', '$usuario');
     }
 
     setState(() {

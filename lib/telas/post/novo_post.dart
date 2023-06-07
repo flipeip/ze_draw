@@ -6,19 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as path;
-import 'package:badges/badges.dart' as badges;
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:uuid/uuid.dart';
-import 'package:ze_draw/telas/tela_inicial.dart';
-
-import '../../api/autenticacao.dart';
-import '../feed/feed_inicial.dart';
 
 import '../../api/api.dart';
+import '../../api/autenticacao.dart';
 import '../../api/post/api_arq_post.dart';
 import '../../api/post/api_post.dart';
 import '../../models/models.dart';
 import '../../widgets/botao_default.dart';
-import '../../widgets/campo_pesquisa.dart';
+import '../tela_inicial.dart';
 import 'novo_post_controlador.dart';
 
 class NovoPostTela extends StatefulWidget {
@@ -56,19 +53,23 @@ class _NovoPostTela extends State<NovoPostTela>{
     });
   }
 
-  bool _isBadgeTapped = false;
+  bool _isBadgeTapped = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const CampoPesquisa(label: 'Pesquisar'),
-        actions: [
-          IconButton(onPressed: (){}, icon: const Icon(FontAwesomeIcons.ellipsisVertical), color: const Color(0xFF679C8A)),
-        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop(context);
+          },
+        ),
+        title: const Text('Feed Inicial', style: TextStyle(fontSize: 18, color: Color(0xFF679C8A), fontWeight: FontWeight.w500)),
         shadowColor: Colors.black12,
         elevation: 10,
         surfaceTintColor: Colors.white,
+        iconTheme: const IconThemeData(color: Color(0xFF679C8A)),
       ),
       body: Column(
         children:[
@@ -78,7 +79,7 @@ class _NovoPostTela extends State<NovoPostTela>{
               children: [
                 GestureDetector(
                   onTap: selecionarImagens,
-                  child: Container(
+                  child: SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: DottedBorder(
                         color: const Color(0XFF679C8A),
@@ -128,8 +129,8 @@ class _NovoPostTela extends State<NovoPostTela>{
                           child: Badge(
                             alignment: AlignmentDirectional.topEnd,
                             largeSize: 20,
-                            label: Icon(FontAwesomeIcons.xmark, color: Colors.white, size: 12),
-                            backgroundColor: Color(0xFF679C8A),
+                            label: const Icon(FontAwesomeIcons.xmark, color: Colors.white, size: 12),
+                            backgroundColor: const Color(0xFF679C8A),
                             child: GestureDetector(
                               onTap: () {
                                   setState(() {
@@ -142,7 +143,7 @@ class _NovoPostTela extends State<NovoPostTela>{
                                     color: const Color(0XFFF1F1F1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  margin: EdgeInsets.all(4),
+                                  margin: const EdgeInsets.all(4),
                                   width: MediaQuery.of(context).size.width * 0.18,
                                   height: MediaQuery.of(context).size.width * 0.18,
                                   child: ClipRRect(
@@ -206,18 +207,18 @@ class _NovoPostTela extends State<NovoPostTela>{
 
 
   Future _createData() async {
-    int usuario = int.parse(Autenticacao.usuario ?? '');
+    int? usuario = Autenticacao.usuario;
 
-    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuario_id: usuario);
+    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuarioId: usuario!);
   
     List<dynamic> res = await criarPost.createData(postagem);
 
     for(var file in imagensSelecionadas) {
-      final uuid = Uuid();
-      final new_uuid = uuid.v4();
+      var uuid = const Uuid();
+      final newUuid = uuid.v4();
 
-      await api.storage.from("arquivos_postagem").upload('${res[0]['id']}/${new_uuid+path.extension(file.path)}', file);
-      Arquivo arquivo = Arquivo(arquivo: new_uuid+path.extension(file.path), postagem: res[0]['id']);
+      await api.storage.from("arquivos_postagem").upload('${res[0]['id']}/${newUuid+path.extension(file.path)}', file);
+      Arquivo arquivo = Arquivo(arquivo: newUuid+path.extension(file.path), postagem: res[0]['id']);
 
       criarArquivoPost.createData(arquivo);
     }
@@ -226,11 +227,13 @@ class _NovoPostTela extends State<NovoPostTela>{
     //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error!.message)));
     // }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Arte publicada! :)", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Arte publicada! :)", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => TelaInicial()),
+    PersistentNavBarNavigator.pushNewScreen(
+        context,
+        screen: TelaInicial(),
+        withNavBar: false,
+        pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );
 
   }

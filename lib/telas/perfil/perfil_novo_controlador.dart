@@ -16,7 +16,7 @@ class NovoPerfilControlador extends StatefulWidget {
 
   void createData(BuildContext context) async {
     try {
-      Navigator.of(context).pushNamed(Rotas.telaIncial);
+      Navigator.of(context).pushNamed(Rotas.feed);
       // TODO: Ir para tela de feed.
     } catch (e) {
       log(e.toString());
@@ -28,6 +28,6 @@ class NovoPerfilControlador extends StatefulWidget {
 class _NovoPerfilControladorState extends State<NovoPerfilControlador> {
   @override
   Widget build(BuildContext context) {
-    return NovoPerfilTela();
+    return const NovoPerfilTela();
   }
 }

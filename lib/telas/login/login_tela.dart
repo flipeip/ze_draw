@@ -17,7 +17,7 @@ class LoginTela extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const alturaImagens = 150.0;
+    var alturaImagens = MediaQuery.of(context).size.width * 0.32;
 
     return Scaffold(
       body: Stack(
@@ -59,7 +59,7 @@ class LoginTela extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 64),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 46),
                       child: SvgPicture.asset('assets/images/logo.svg'),
                     ),
                     CampoTexto(
@@ -143,7 +143,7 @@ class _Divisor extends StatelessWidget {
     final divisor = Expanded(child: Divider(color: cor));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 18),
       child: Row(
         children: [
           divisor,

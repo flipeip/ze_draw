@@ -50,7 +50,7 @@ class CadastroControlador extends StatelessWidget {
 
     Autenticacao.criarConta(email.text, senha.text).then((value) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Conta criada.')),
+        const SnackBar(content: Text('Conta criada com sucesso! :D', style: TextStyle(color: Colors.white),),backgroundColor: Colors.green),
       );
       Navigator.of(context).pushNamed(Rotas.novoPerfil);
     });
