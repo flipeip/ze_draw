@@ -2,34 +2,34 @@
 import 'dart:convert';
 
 class Curtidas {
-  final int usuario_id;
-  final int postagem_id;
+  final int usuarioId;
+  final int postagemId;
   Curtidas({
-    required this.usuario_id,
-    required this.postagem_id,
+    required this.usuarioId,
+    required this.postagemId,
   });
 
   Curtidas copyWith({
-    int? usuario_id,
-    int? postagem_id,
+    int? usuarioId,
+    int? postagemId,
   }) {
     return Curtidas(
-      usuario_id: usuario_id ?? this.usuario_id,
-      postagem_id: postagem_id ?? this.postagem_id,
+      usuarioId: usuarioId ?? this.usuarioId,
+      postagemId: postagemId ?? this.postagemId,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'usuario_id': usuario_id,
-      'postagem_id': postagem_id,
+      'usuario_id': usuarioId,
+      'postagem_id': postagemId,
     };
   }
 
   factory Curtidas.fromMap(Map<String, dynamic> map) {
     return Curtidas(
-      usuario_id: map['usuario_id'] as int,
-      postagem_id: map['postagem_id'] as int,
+      usuarioId: map['usuario_id'] as int,
+      postagemId: map['postagem_id'] as int,
     );
   }
 
@@ -38,17 +38,17 @@ class Curtidas {
   factory Curtidas.fromJson(String source) => Curtidas.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'Curtidas(usuario_id: $usuario_id, postagem_id: $postagem_id)';
+  String toString() => 'Curtidas(usuario_id: $usuarioId, postagem_id: $postagemId)';
 
   @override
   bool operator ==(covariant Curtidas other) {
     if (identical(this, other)) return true;
   
     return 
-      other.usuario_id == usuario_id &&
-      other.postagem_id == postagem_id;
+      other.usuarioId == usuarioId &&
+      other.postagemId == postagemId;
   }
 
   @override
-  int get hashCode => usuario_id.hashCode ^ postagem_id.hashCode;
+  int get hashCode => usuarioId.hashCode ^ postagemId.hashCode;
 }

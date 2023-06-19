@@ -24,11 +24,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var rotaInicial = Rotas.login;
-    // if (Autenticacao.sessao != null){
-    //   rotaInicial = Rotas.telaIncial;
-    // }
     var rotaInicial = Rotas.login;
+    if (Autenticacao.sessao != null){
+      rotaInicial = Rotas.telaIncial;
+    }
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: Tema.padrao,
