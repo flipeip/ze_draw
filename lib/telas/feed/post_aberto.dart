@@ -13,6 +13,7 @@ import '../../api/post/api_comentarios.dart';
 import '../../api/post/api_curtidas.dart';
 import 'package:ze_draw/models/models.dart';
 import '../../api/post/api_post.dart';
+import 'arquivo_aberto.dart';
 import 'comentar_controlador.dart';
 
 class PostAbertoTela extends StatefulWidget {
@@ -230,18 +231,47 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                                 onTap: (){
                                   PersistentNavBarNavigator.pushNewScreen(
                                       context,
-                                      screen: PostAbertoTela(post: widget.postagem.id),
+                                      screen: ArquivoAbertoTela(post: widget.postagem.id),
                                       withNavBar: true,
                                       pageTransitionAnimation: PageTransitionAnimation.cupertino,
                                   );
                                 },
-                                child: SizedBox(
-                                    height: 300,
-                                    child: FittedBox(
-                                      fit: BoxFit.cover,
-                                      child: Image.network(imageUrl)
+                                child: Stack(
+                                  children: [
+                                    SizedBox(
+                                      width: MediaQuery.sizeOf(context).width,
+                                      height: 300,
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: Image.network(imageUrl)
+                                      ),
                                     ),
-                                  ),
+                                    Positioned(
+                                      top: 8,
+                                      right: 8,
+                                      child: 
+                                        Container(
+                                          decoration: const BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.all(Radius.circular(6))),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                                  child: Text('${arquivos.length}', style: const TextStyle(color:Colors.white, fontSize: 14)),
+                                                ),
+                                                const Padding(
+                                                  padding: EdgeInsets.only(right: 4.0),
+                                                  child: Icon(FontAwesomeIcons.solidClone, color: Colors.white, size: 14),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    )
+                                  ],
+                                ),
                               );
                             } else {
                               return const Text('Imagem indisponível');
@@ -277,8 +307,9 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
             ),
           ),
           Container(
+            height: MediaQuery.sizeOf(context).height * 0.365,
             alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery.sizeOf(context).width,
             decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
@@ -290,7 +321,7 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.84,
+                        width: MediaQuery.sizeOf(context).width * 0.84,
                         child: TextFormField(
                           controller: controlador.comentario,
                           decoration: InputDecoration(
@@ -318,31 +349,22 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                   future: lerComentarios.getComentariosPostagem(widget.postagem.id),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container(
-                        decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Center(
-                            child: CircularProgressIndicator(color: Color(0xFF679C8A))
-                          ),
-                        )
-                      );
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
+                        child: Text('Carregando comentários...', style: TextStyle(color: Color(0xFF989898))
+                      ));
                     } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       final comentarios = snapshot.data!;
                       return Column(
                         children: comentarios.map(
-                            (comentario) => ComentariosWidget(postComent: widget.postagem, comentario: comentario)
-                          ).toList()
+                          (comentario) => ComentariosWidget(postComent: widget.postagem, comentario: comentario)
+                        ).toList()
                       );
                     } else {
-                      return Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width,
-                        decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
-                          child: Text('Não há comentários', style: TextStyle(color: Color(0xFF989898))
-                      )));
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
+                        child: Text('Não há comentários', style: TextStyle(color: Color(0xFF989898))
+                      ));
                     }
                   }
                 ),
@@ -394,7 +416,7 @@ class ComentariosWidget extends StatefulWidget{
         future: lerPost.getUsuarioPostagem(widget.comentario.usuarioId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A)));
+            return const Center(child: Text('Carregando...', style: TextStyle(color: Color(0xFF989898))));
           } else if (snapshot.hasData) {
             return Row(
               children: [
