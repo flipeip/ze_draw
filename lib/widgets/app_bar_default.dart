@@ -22,7 +22,7 @@ class AppBarDefault extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () {
           PersistentNavBarNavigator.pushNewScreen(
               context,
-              screen: TelaInicial(),
+              screen: const TelaInicial(),
               withNavBar: false,
               pageTransitionAnimation: PageTransitionAnimation.cupertino,
           );
