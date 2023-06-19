@@ -229,13 +229,31 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                                       pageTransitionAnimation: PageTransitionAnimation.cupertino,
                                   );
                                 },
-                                child: SizedBox(
-                                    height: 300,
-                                    child: FittedBox(
-                                      fit: BoxFit.cover,
-                                      child: Image.network(imageUrl)
+                                child: Stack(
+                                  children: [
+                                    SizedBox(
+                                      height: 300,
+                                      width: MediaQuery.sizeOf(context).width,
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: ShaderMask(
+                                          shaderCallback: (Rect bounds) {
+                                            return LinearGradient(
+                                              colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                                              begin: const FractionalOffset(0.5, 0.3),
+                                              end: Alignment.bottomCenter,
+                                            ).createShader(bounds);
+                                          },
+                                          blendMode: BlendMode.srcATop,
+                                          child: Image.network(imageUrl))
+                                      ),
                                     ),
-                                  ),
+                                    Positioned(
+                                      bottom: 16,
+                                      left: 16,
+                                      child: Text(widget.postagem.titulo, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w300)))
+                                  ],
+                                ),
                               );
                             } else {
                               return const Text('Imagem indisponível');
