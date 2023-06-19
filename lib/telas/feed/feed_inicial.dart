@@ -337,7 +337,14 @@ class AcoesWidget extends StatefulWidget{
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: PostAbertoTela(post: widget.postagem.id),
+                      withNavBar: true,
+                      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                  );
+                },
                 icon: const Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
                 label: const Text('0', style: TextStyle(color: Color(0xFF989898))),
                 style: ButtonStyle(
@@ -349,7 +356,14 @@ class AcoesWidget extends StatefulWidget{
             } else if (snapshot.hasData) {
               final comentarios = snapshot.data!.length;
               return TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: PostAbertoTela(post: widget.postagem.id),
+                      withNavBar: true,
+                      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                  );
+                },
                 icon: const Icon(FontAwesomeIcons.solidCommentDots, color: Color(0xFF989898)),
                 label: Text('$comentarios', style: const TextStyle(color: Color(0xFF989898))),
                 style: ButtonStyle(
@@ -389,7 +403,7 @@ class AcoesWidget extends StatefulWidget{
   Future _curtirPost(postagemId) async {
     int? usuario = Autenticacao.usuario;
 
-    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario!);
+    Curtidas curtida = Curtidas(postagemId: postagemId, usuarioId: usuario!);
     try {
       await lerCurtida.createData(curtida);
     } catch(error){

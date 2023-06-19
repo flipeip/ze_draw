@@ -46,7 +46,7 @@ class _PostAbertoTelaState extends State<PostAbertoTela> {
             Postagem postagem = snapshot.data![0];
            return PostagemUnicaWidget(postagem: postagem);
           }
-          return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A),));
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A)));
         }),
       ),
       floatingActionButton: FloatingActionButton(
@@ -90,6 +90,8 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
   ApiArquivoPost lerArquivos = ApiArquivoPost();
   ApiPerfil lerPerfil = ApiPerfil();
   ApiComentariosPost lerComentarios = ApiComentariosPost();
+
+  ComentarioControlador controlador = ComentarioControlador();
 
   String formatoHora(Duration duration) {
     if (duration.inDays > 1) {
@@ -208,27 +210,47 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               } else {
-                final arquivo = snapshot.data![0].arquivo;
-                return FutureBuilder<String>(
-                  future: lerArquivos.getArquivoBucketUrl('${widget.postagem.id}/$arquivo'),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
-                    } else if (snapshot.hasData) {
-                      final imageUrl = snapshot.data!;
-                      return SizedBox(
-                        height: 300,
-                        width: MediaQuery.of(context).size.width,
-                        child: ClipRRect(
-                          child: Image.network(imageUrl, fit: BoxFit.cover),
+                final arquivos = snapshot.data ?? [];
+                  return SizedBox(
+                  height: 300,
+                  child: PageView(
+                    scrollDirection: Axis.horizontal,
+                    children: arquivos
+                      .map(
+                        (arquivo) => FutureBuilder<String>(
+                          future: lerArquivos.getArquivoBucketUrl('${widget.postagem.id}/${arquivo.arquivo}'),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('${snapshot.error}');
+                            } else if (snapshot.hasData) {
+                              final imageUrl = snapshot.data!;
+                              return GestureDetector(
+                                onTap: (){
+                                  PersistentNavBarNavigator.pushNewScreen(
+                                      context,
+                                      screen: PostAbertoTela(post: widget.postagem.id),
+                                      withNavBar: true,
+                                      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                                  );
+                                },
+                                child: SizedBox(
+                                    height: 300,
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: Image.network(imageUrl)
+                                    ),
+                                  ),
+                              );
+                            } else {
+                              return const Text('Imagem indisponível');
+                            }
+                          },
                         ),
-                      );
-                    } else {
-                      return const Text('Imagem indisponível');
-                    }
-                  },
+                      )
+                      .toList(),
+                    ),
                 );
               }
             },
@@ -254,49 +276,102 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
               child: AcoesWidget(postagem: widget.postagem),
             ),
           ),
-          FutureBuilder(
-            future: lerComentarios.getComentariosPostagem(widget.postagem.id),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container(
-                  decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF679C8A),)
-                  )
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              } else if (snapshot.hasData) {
-                return Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
-                    child: Text('Não há comentários', style: TextStyle(color: Color(0xFF989898)),)
-                ));
-              } else {
-                return Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
-                    child: Text('Não há comentários', style: TextStyle(color: Color(0xFF989898))
-                )));
-              }
-            }
-          ),
+          Container(
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
+              child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom:18.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.84,
+                        child: TextFormField(
+                          controller: controlador.comentario,
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(50), borderSide: BorderSide.none),
+                              hintText: 'Faça um novo comentário!',
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: IconButton(
+                          onPressed: () => _comentarPost(widget.postagem.id),
+                          icon: const Icon(FontAwesomeIcons.paperPlane, size: 18),
+                          color: Colors.white,
+                          style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((states) => const Color(0xFF679C8A))),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                FutureBuilder<List<Comentarios>>(
+                  future: lerComentarios.getComentariosPostagem(widget.postagem.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(
+                            child: CircularProgressIndicator(color: Color(0xFF679C8A))
+                          ),
+                        )
+                      );
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      final comentarios = snapshot.data!;
+                      return Column(
+                        children: comentarios.map(
+                            (comentario) => ComentariosWidget(postComent: widget.postagem, comentario: comentario)
+                          ).toList()
+                      );
+                    } else {
+                      return Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
+                          child: Text('Não há comentários', style: TextStyle(color: Color(0xFF989898))
+                      )));
+                    }
+                  }
+                ),
+              ])
+          )),
           ],
       ),
     );
+  }
+
+  Future _comentarPost(postagemId) async {
+    int? usuario = Autenticacao.usuario;
+
+    Comentarios comentario = Comentarios(postagem: postagemId, usuarioId: usuario!, comentario: controlador.comentario.text);
+    await lerComentarios.createData(comentario);
+
+    setState(() {
+      controlador.comentario.text = '';
+      lerComentarios.getComentariosPostagem(postagemId);
+    });
+    
   }
   
 }
 
 class ComentariosWidget extends StatefulWidget{
   final Postagem postComent;
-  const ComentariosWidget({super.key, required this.postComent, required Comentarios comentario});
+  final Comentarios comentario;
+  const ComentariosWidget({super.key, required this.postComent, required this.comentario});
 
   @override
     State<ComentariosWidget> createState() => _ComentariosWidgetState();
@@ -309,133 +384,82 @@ class ComentariosWidget extends StatefulWidget{
   ApiComentariosPost lerComentarios = ApiComentariosPost();
   final int? usuario = Autenticacao.usuario;
 
-  ComentarioControlador controlador = ComentarioControlador();
-
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal:8.0, vertical:16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom:18.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.80,
-                    child: TextFormField(
-                      controller: controlador.comentario,
-                      decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(50), borderSide: BorderSide.none),
-                          hintText: 'Faça um novo comentário!',
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: IconButton(
-                      onPressed: (){},
-                      icon: const Icon(FontAwesomeIcons.paperPlane, size: 18),
-                      color: Colors.white,
-                      style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((states) => const Color(0xFF679C8A))),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FutureBuilder<List<dynamic>>(
-              future: lerPost.getUsuarioPostagem(30),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasData) {
-                  return Row(
-                    children: [
-                      FutureBuilder<String>(
-                        future: lerPerfil.getUsuarioBucketUrl('${30}'),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Container(
-                              width: 42,
-                              height: 42,
-                              child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 197, 197, 197),
-                                borderRadius: BorderRadius.all(Radius.circular(50))
-                              ),
-                            );
-                          } else if (snapshot.hasData && widget.postComent.id != null) {
-                            final imageUrl = snapshot.data!;
-                            return GestureDetector(
-                              onTap: (){
-                                PersistentNavBarNavigator.pushNewScreen(
-                                    context,
-                                    screen: PerfilTela(usuario: widget.postComent.usuarioId),
-                                    withNavBar: true,
-                                    pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                                );
-                              },
-                              child: CircleAvatar(
-                                backgroundImage: Image.network(imageUrl).image,
-                              ),
-                            );
-                          } else {
-                            return Container(
-                              width: 42,
-                              height: 42,
-                              child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 197, 197, 197),
-                                borderRadius: BorderRadius.all(Radius.circular(50))
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            widget.postComent.id != null 
-                            ? Text('', style: const TextStyle(fontWeight: FontWeight.w600),)
-                            : const Text('...'),
-                            Text(''),
-                          ],
+        padding: const EdgeInsets.all(8.0),
+        child: FutureBuilder<List<dynamic>>(
+        future: lerPost.getUsuarioPostagem(widget.comentario.usuarioId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A)));
+          } else if (snapshot.hasData) {
+            return Row(
+              children: [
+                FutureBuilder<String>(
+                  future: lerPerfil.getUsuarioBucketUrl('${snapshot.data![0].foto}'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        width: 42,
+                        height: 42,
+                        child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 197, 197, 197),
+                          borderRadius: BorderRadius.all(Radius.circular(50))
                         ),
-                      )
-                    ],
-                  );
-                } else {
-                  return const Center(child: Text('Ocorreu um erro'));
-                }
-              }
+                      );
+                    } else if (snapshot.hasData && widget.postComent.id != null) {
+                      final imageUrl = snapshot.data!;
+                      return GestureDetector(
+                        onTap: (){
+                          PersistentNavBarNavigator.pushNewScreen(
+                              context,
+                              screen: PerfilTela(usuario: widget.postComent.usuarioId),
+                              withNavBar: true,
+                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                          );
+                        },
+                        child: CircleAvatar(
+                          backgroundImage: Image.network(imageUrl).image,
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        width: 42,
+                        height: 42,
+                        child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 197, 197, 197),
+                          borderRadius: BorderRadius.all(Radius.circular(50))
+                        ),
+                      );
+                    }
+                  },
                 ),
-            )
-          ],
-        ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      widget.postComent.id != null 
+                      ? Text(snapshot.data![0].nome, style: const TextStyle(fontWeight: FontWeight.w600),)
+                      : const Text('...'),
+                      Text(widget.comentario.comentario),
+                    ],
+                  ),
+                )
+              ],
+            );
+          } else {
+            return const Center(child: Text('Ocorreu um erro'));
+          }
+        }
+          ),
       )
     );
-  }
-
-  Future _comentarPost(postagemId, novoComentario) async {
-    int? usuario = Autenticacao.usuario;
-
-    Comentarios comentario = Comentarios(postagemId: postagemId, usuarioId: usuario!, comentario: novoComentario);
-    await lerComentarios.createData(comentario);
-
-    setState(() {
-      lerComentarios.getComentariosPostagem(postagemId);
-    });
-    
   }
 }
 
@@ -565,7 +589,7 @@ class AcoesWidget extends StatefulWidget{
   Future _curtirPost(postagemId) async {
     int? usuario = Autenticacao.usuario;
 
-    Curtidas curtida = Curtidas(postagem_id: postagemId, usuario_id: usuario!);
+    Curtidas curtida = Curtidas(postagemId: postagemId, usuarioId: usuario!);
     try {
       await lerCurtida.createData(curtida);
     } catch(error){

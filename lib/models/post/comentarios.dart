@@ -3,22 +3,22 @@ import 'dart:convert';
 
 class Comentarios {
   final int usuarioId;
-  final int postagemId;
+  final int postagem;
   final String comentario;
   Comentarios({
     required this.usuarioId,
-    required this.postagemId,
+    required this.postagem,
     required this.comentario,
   });
 
   Comentarios copyWith({
     int? usuarioId,
-    int? postagemId,
+    int? postagem,
     String? comentario,
   }) {
     return Comentarios(
       usuarioId: usuarioId ?? this.usuarioId,
-      postagemId: postagemId ?? this.postagemId,
+      postagem: postagem ?? this.postagem,
       comentario: comentario ?? this.comentario,
     );
   }
@@ -26,7 +26,7 @@ class Comentarios {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'usuario_id': usuarioId,
-      'postagem_id': postagemId,
+      'postagem': postagem,
       'comentario': comentario,
     };
   }
@@ -34,7 +34,7 @@ class Comentarios {
   factory Comentarios.fromMap(Map<String, dynamic> map) {
     return Comentarios(
       usuarioId: map['usuario_id'] as int,
-      postagemId: map['postagem_id'] as int,
+      postagem: map['postagem'] as int,
       comentario: map['comentario'] as String,
     );
   }
@@ -44,7 +44,7 @@ class Comentarios {
   factory Comentarios.fromJson(String source) => Comentarios.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'Comentarios(usuario_id: $usuarioId, postagem_id: $postagemId, comentario: $comentario)';
+  String toString() => 'Comentarios(usuario_id: $usuarioId, postagem: $postagem, comentario: $comentario)';
 
   @override
   bool operator ==(covariant Comentarios other) {
@@ -52,10 +52,10 @@ class Comentarios {
   
     return 
       other.usuarioId == usuarioId &&
-      other.postagemId == postagemId &&
+      other.postagem == postagem &&
       other.comentario == comentario;
   }
 
   @override
-  int get hashCode => usuarioId.hashCode ^ postagemId.hashCode ^ comentario.hashCode;
+  int get hashCode => usuarioId.hashCode ^ postagem.hashCode ^ comentario.hashCode;
 }
