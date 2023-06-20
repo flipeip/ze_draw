@@ -43,7 +43,7 @@ class _PostAbertoTelaState extends State<PostAbertoTela> {
         builder: ((context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
-          } else if (snapshot.hasData) {
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             Postagem postagem = snapshot.data![0];
            return PostagemUnicaWidget(postagem: postagem);
           }

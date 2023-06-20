@@ -9,13 +9,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:uuid/uuid.dart';
-import 'package:ze_draw/telas/evento/tela_evento.dart';
 
 import '../../api/api.dart';
 import '../../api/autenticacao.dart';
 import '../../api/post/api_arq_post.dart';
+import '../../api/post/api_evento.dart';
 import '../../api/post/api_post.dart';
 import '../../models/models.dart';
+import '../../models/post/usuario_conquista.dart';
 import '../../widgets/botao_default.dart';
 import '../tela_inicial.dart';
 import 'novo_post_controlador.dart';
@@ -212,9 +213,19 @@ class _NovoPostTela extends State<NovoPostTela>{
 
   Future _createData() async {
     int? usuario = Autenticacao.usuario;
+
     PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuarioId: usuario!, evento: widget.evento);
-  
     List<dynamic> res = await criarPost.createData(postagem);
+    
+    if(widget.evento != null){
+      ApiEvento lerEvento = ApiEvento();
+      late final int? conquistaId;
+      List<dynamic> response = await lerEvento.readEvento(widget.evento!);
+      conquistaId = response[0]['conquista'];
+
+      UsuarioConquista conquista = UsuarioConquista(usuarioId: usuario, conquistaId: conquistaId!);
+      await criarPost.novaConquista(conquista);
+    }
 
     for(var file in imagensSelecionadas) {
       var uuid = const Uuid();
@@ -232,23 +243,11 @@ class _NovoPostTela extends State<NovoPostTela>{
 
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Arte publicada! :)", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
 
-    if (widget.evento != null){
-      PersistentNavBarNavigator.pushNewScreen(
-        context,
-        screen: const EventoTela(),
-        withNavBar: true,
-        pageTransitionAnimation: PageTransitionAnimation.cupertino,
-      );
-    }else{
-      PersistentNavBarNavigator.pushNewScreen(
-        context,
-        screen: const TelaInicial(),
-        withNavBar: false,
-        pageTransitionAnimation: PageTransitionAnimation.cupertino,
-      );
-    }
-    
-
+    PersistentNavBarNavigator.pushNewScreen(
+      context,
+      screen: const TelaInicial(),
+      withNavBar: true,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
   }
-  
 }

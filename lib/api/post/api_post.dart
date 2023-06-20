@@ -1,4 +1,5 @@
 import '../../../models/models.dart';
+import '../../models/post/usuario_conquista.dart';
 import '../api.dart';
 
 class ApiPost {
@@ -28,6 +29,11 @@ class ApiPost {
   Future<dynamic> getUltimoEvento() async {
     List<dynamic> res = await api.from('evento')
         .select().order('data_termino', ascending: false).limit(1);
+    return res;
+  }
+
+  Future<dynamic> novaConquista(UsuarioConquista conquista) async {
+    List<dynamic> res = await api.from('usuario_conquista').insert(conquista.toMap()).select();
     return res;
   }
 
