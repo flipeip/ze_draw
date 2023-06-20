@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:uuid/uuid.dart';
@@ -231,7 +232,7 @@ class _NovoPostTela extends State<NovoPostTela>{
 
     PersistentNavBarNavigator.pushNewScreen(
         context,
-        screen: TelaInicial(),
+        screen: const TelaInicial(),
         withNavBar: false,
         pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );

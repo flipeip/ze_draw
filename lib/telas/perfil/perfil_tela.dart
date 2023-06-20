@@ -1,5 +1,6 @@
 import 'dart:io';
 
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:uuid/uuid.dart';
 import 'package:ze_draw/api/post/api_arq_post.dart';
 import 'package:ze_draw/widgets/app_bar_default.dart';
-
 
 import '../../api/api.dart';
 import '../../api/api_perfil.dart';
@@ -19,7 +19,6 @@ import '../feed/post_aberto.dart';
 
 class PerfilTela extends StatefulWidget {
   final int? usuario;
-
   const PerfilTela({Key? key, required this.usuario}): super(key: key);
 
   @override
@@ -28,6 +27,13 @@ class PerfilTela extends StatefulWidget {
 class _PerfilTela extends State<PerfilTela>{
   ApiPerfil lerPerfil = ApiPerfil();
   ApiArquivoPost lerArquivos = ApiArquivoPost();
+  late Future<List<Usuario>> usuarioPerfilFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    usuarioPerfilFuture = readData();
+  }
 
   Future<List<Usuario>> readData() async {
     List<dynamic> response = await lerPerfil.getUsuario(widget.usuario!);
@@ -40,7 +46,7 @@ class _PerfilTela extends State<PerfilTela>{
       appBar: const AppBarDefault(),
       body: SingleChildScrollView(
         child: FutureBuilder(
-          future: readData(),
+          future: usuarioPerfilFuture,
           builder: ((context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SizedBox(
@@ -58,7 +64,12 @@ class _PerfilTela extends State<PerfilTela>{
                 Usuario perfil = snapshot.data![0];
                 return Column(
                   children: [
-                    CapaWidget(perfil: perfil, usuarioPerfil: widget.usuario!),
+                    CapaWidget(perfil: perfil, usuarioPerfil: widget.usuario!,
+                    recarregarCapa: () {
+                      setState(() {
+                        usuarioPerfilFuture = readData();
+                      });
+                    }),
                     Transform.translate(
                       offset: const Offset(0, -54),
                       child: Padding(
@@ -246,8 +257,8 @@ class _PerfilTela extends State<PerfilTela>{
 class CapaWidget extends StatefulWidget{
   final Usuario perfil;
   final int usuarioPerfil;
-
-  const CapaWidget({super.key, required this.perfil, required this.usuarioPerfil});
+  final Function recarregarCapa;
+  const CapaWidget({super.key, required this.perfil, required this.usuarioPerfil, required this.recarregarCapa});
 
   @override
     State<CapaWidget> createState() => _CapaWidgetState();
@@ -256,8 +267,6 @@ class CapaWidget extends StatefulWidget{
     ApiPerfil lerPerfil = ApiPerfil();
 
     File? imagemSelecionada;
-
-    bool _isBadgeTapped = true;
 
     @override
     Widget build(BuildContext context) {
@@ -277,35 +286,32 @@ class CapaWidget extends StatefulWidget{
           );
           } else if (snapshot.hasData && widget.perfil.capa != null) {
             if (widget.usuarioPerfil == Autenticacao.usuario as int){
-              return GestureDetector(
-              onTap: () {
-                if (_isBadgeTapped) {
-                  _atualizarCapa();
-                }
-              },
-              child: Badge(
-                largeSize: 25,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                label: const Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12,),
-                backgroundColor: Colors.black26,
-                alignment: const Alignment(0.85, 0.9),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isBadgeTapped = true;
-                    });
-                  },
-                  child:SizedBox(
-                      height: 120,
-                      width: MediaQuery.of(context).size.width,
-                      child: ClipRRect(
-                        child: Image.network(snapshot.data!, fit: BoxFit.cover),
-                      ),
+              return Stack(
+                children: [
+                  SizedBox(
+                    height: 120,
+                    width: MediaQuery.of(context).size.width,
+                    child: ClipRRect(
+                      child: Image.network(snapshot.data!, fit: BoxFit.cover),
+                    ),
                   ),
-                ),
-              ),
-            );
-            }else{
+                  Positioned(
+                    bottom: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () => _atualizarCapa(),
+                      child: Container(
+                        decoration: const BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.all(Radius.circular(15))),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                          child: Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12),
+                        ),
+                      ),
+                    )
+                  )
+                ] 
+              );
+            } else{
               return SizedBox(
                   height: 120,
                   width: MediaQuery.of(context).size.width,
@@ -315,36 +321,15 @@ class CapaWidget extends StatefulWidget{
               );
             }
           } else {
-            return GestureDetector(
-              onTap: () {
-                if (_isBadgeTapped) {
-                  _atualizarCapa();
-                }
-              },
-              child: Badge(
-                largeSize: 25,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                label: const Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12,),
-                backgroundColor: Colors.black26,
-                alignment: const Alignment(0.85, 0.9),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isBadgeTapped = true;
-                    });
-                  },
-                  child:Container(
-                    height: 120,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.black45, Colors.black54, Colors.black87]
-                        )
-                      ),
-                  ),
+            return Container(
+              height: 120,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black45, Colors.black54, Colors.black87]
+                  )
                 ),
-              ),
             );
           }
       }));
@@ -378,6 +363,7 @@ class CapaWidget extends StatefulWidget{
 
       setState(() {
         lerPerfil.getUsuarioCapaBucketUrl(newUuid+path.extension(imagemSelecionada!.path));
+        widget.recarregarCapa();
       });
     }
 }

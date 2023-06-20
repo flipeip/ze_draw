@@ -1,11 +1,11 @@
 // ignore_for_file: sort_child_properties_last
 
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:ze_draw/api/post/api_arq_post.dart';
 import 'package:ze_draw/telas/perfil/perfil_tela.dart';
-import 'package:ze_draw/telas/post/novo_post.dart';
 import 'package:ze_draw/widgets/app_bar_default.dart';
 import '../../api/api_perfil.dart';
 import '../../api/autenticacao.dart';
@@ -50,27 +50,6 @@ class _PostAbertoTelaState extends State<PostAbertoTela> {
           return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A)));
         }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          PersistentNavBarNavigator.pushNewScreen(
-              context,
-              screen: const NovoPostTela(),
-              withNavBar: false,
-              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-          );
-        },
-        child: 
-          Container(
-            width: 60,
-            height: 60,
-            child: const Icon(FontAwesomeIcons.paintbrush, color: Colors.white,),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(colors: [Color(0XFFFF2626), Color(0XFFFFA800), Color(0XFF34D1DB)]),
-            ),
-          ),
-          shape: const CircleBorder(),
-        ),
     );
   }
 }
@@ -93,6 +72,8 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
   ApiComentariosPost lerComentarios = ApiComentariosPost();
 
   ComentarioControlador controlador = ComentarioControlador();
+
+  final PageController _pageController = PageController();
 
   String formatoHora(Duration duration) {
     if (duration.inDays > 1) {
@@ -215,6 +196,7 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                   return SizedBox(
                   height: 300,
                   child: PageView(
+                    controller: _pageController,
                     scrollDirection: Axis.horizontal,
                     children: arquivos
                       .map(
@@ -227,16 +209,18 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                               return Text('${snapshot.error}');
                             } else if (snapshot.hasData) {
                               final imageUrl = snapshot.data!;
+                              int currentPage = _pageController.page?.round() ?? 0;
                               return GestureDetector(
                                 onTap: (){
                                   PersistentNavBarNavigator.pushNewScreen(
                                       context,
                                       screen: ArquivoAbertoTela(post: widget.postagem.id),
-                                      withNavBar: true,
+                                      withNavBar: false,
                                       pageTransitionAnimation: PageTransitionAnimation.cupertino,
                                   );
                                 },
                                 child: Stack(
+                                  alignment: Alignment.bottomCenter,
                                   children: [
                                     SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
@@ -244,6 +228,17 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                                       child: FittedBox(
                                         fit: BoxFit.cover,
                                         child: Image.network(imageUrl)
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 10,
+                                      child: DotsIndicator(
+                                        dotsCount: arquivos.length,
+                                        position: currentPage.toDouble(),
+                                        decorator: const DotsDecorator(
+                                          activeColor: Colors.white, // Cor dos pontos ativos
+                                          color: Colors.grey, // Cor dos pontos inativos
+                                        ),
                                       ),
                                     ),
                                     Positioned(
@@ -321,7 +316,7 @@ class _PostagemUnicaWidgetState extends State<PostagemUnicaWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
-                        width: MediaQuery.sizeOf(context).width * 0.84,
+                        width: MediaQuery.sizeOf(context).width * 0.80,
                         child: TextFormField(
                           controller: controlador.comentario,
                           decoration: InputDecoration(

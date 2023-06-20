@@ -8,7 +8,9 @@ import 'utilidades/tema.dart';
 
 void main() async {
   await iniciarDependencias();
-  await Autenticacao.getUsuario();
+  if (Autenticacao.sessao != null){
+    await Autenticacao.getUsuario();
+  }
   runApp(const MainApp());
 }
 

@@ -14,6 +14,7 @@ import '../../api/post/api_comentarios.dart';
 import '../../api/post/api_curtidas.dart';
 import 'package:ze_draw/models/models.dart';
 import '../../api/post/api_post.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 
 class FeedTela extends StatelessWidget {
   const FeedTela({super.key});
@@ -230,6 +231,7 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                                   );
                                 },
                                 child: Stack(
+                                  alignment: Alignment.center,
                                   children: [
                                     SizedBox(
                                       height: 300,
