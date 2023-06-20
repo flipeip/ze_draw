@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import 'package:ze_draw/telas/post/novo_post.dart';
-import 'package:ze_draw/widgets/app_bar_default.dart';
 import 'package:ze_draw/models/models.dart';
+import '../../api/api.dart';
 import '../../api/post/api_arq_post.dart';
 import '../../api/post/api_post.dart';
+import '../login/login_controlador.dart';
 
 class ArquivoAbertoTela extends StatefulWidget {
   final int? post;
@@ -30,7 +30,43 @@ class _ArquivoAbertoTelaState extends State<ArquivoAbertoTela> {
     ApiArquivoPost lerArquivos = ApiArquivoPost();
 
     return Scaffold(
-      appBar: const AppBarDefault(),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        actions: [
+          PopupMenuButton(
+            color: Colors.white,
+            offset: const Offset(0, 42),
+            icon: const Icon(FontAwesomeIcons.ellipsisVertical, color: Colors.white),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              const PopupMenuItem(
+                value: 'sair',
+                child: Text('Sair')
+              ),
+            ],
+            onSelected: (value) {
+              if (value == 'sair') {
+                api.auth.signOut(); // Executa o logout
+                PersistentNavBarNavigator.pushNewScreen(
+                  context,
+                  screen: LoginControlador(),
+                  withNavBar: false,
+                  pageTransitionAnimation: PageTransitionAnimation.cupertino,
+              );
+              }
+            },
+          ),
+        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop(context);
+          },
+        ),
+        title: const Text('Feed Inicial', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.w500)),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: FutureBuilder(
         future: readPost(widget.post),
         builder: ((context, snapshot) {
@@ -121,28 +157,7 @@ class _ArquivoAbertoTelaState extends State<ArquivoAbertoTela> {
             }
             return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A)));
           }),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          PersistentNavBarNavigator.pushNewScreen(
-              context,
-              screen: const NovoPostTela(),
-              withNavBar: false,
-              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-          );
-        },
-        shape: const CircleBorder(),
-        child: 
-          Container(
-            width: 60,
-            height: 60,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(colors: [Color(0XFFFF2626), Color(0XFFFFA800), Color(0XFF34D1DB)]),
-            ),
-            child: const Icon(FontAwesomeIcons.paintbrush, color: Colors.white,),
-          ),
-        ),
+      )
     );
   }
 }

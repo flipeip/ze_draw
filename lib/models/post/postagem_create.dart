@@ -5,21 +5,25 @@ class PostagemCreate {
   final String titulo;
   final String descricao;
   final int usuarioId;
+  final int? evento;
   PostagemCreate({
     required this.titulo,
     required this.descricao,
     required this.usuarioId,
+    this.evento,
   });
 
   PostagemCreate copyWith({
     String? titulo,
     String? descricao,
     int? usuarioId,
+    int? evento,
   }) {
     return PostagemCreate(
       titulo: titulo ?? this.titulo,
       descricao: descricao ?? this.descricao,
       usuarioId: usuarioId ?? this.usuarioId,
+      evento: evento ?? this.evento,
     );
   }
 
@@ -28,6 +32,7 @@ class PostagemCreate {
       'titulo': titulo,
       'descricao': descricao,
       'usuario_id': usuarioId,
+      'evento': evento,
     };
   }
 
@@ -36,6 +41,7 @@ class PostagemCreate {
       titulo: map['titulo'] as String,
       descricao: map['descricao'] as String,
       usuarioId: map['usuario_id'] as int,
+      evento: map['evento'] != null ? map['evento'] as int : null,
     );
   }
 
@@ -44,7 +50,9 @@ class PostagemCreate {
   factory PostagemCreate.fromJson(String source) => PostagemCreate.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'PostagemCreate(titulo: $titulo, descricao: $descricao, usuario_id: $usuarioId)';
+  String toString() {
+    return 'PostagemCreate(titulo: $titulo, descricao: $descricao, usuario_id: $usuarioId, evento: $evento)';
+  }
 
   @override
   bool operator ==(covariant PostagemCreate other) {
@@ -53,9 +61,15 @@ class PostagemCreate {
     return 
       other.titulo == titulo &&
       other.descricao == descricao &&
-      other.usuarioId == usuarioId;
+      other.usuarioId == usuarioId &&
+      other.evento == evento;
   }
 
   @override
-  int get hashCode => titulo.hashCode ^ descricao.hashCode ^ usuarioId.hashCode;
+  int get hashCode {
+    return titulo.hashCode ^
+      descricao.hashCode ^
+      usuarioId.hashCode ^
+      evento.hashCode;
+  }
 }

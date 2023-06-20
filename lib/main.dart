@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'api/autenticacao.dart';
@@ -8,7 +9,9 @@ import 'utilidades/tema.dart';
 
 void main() async {
   await iniciarDependencias();
-  await Autenticacao.getUsuario();
+  if (Autenticacao.sessao != null){
+    await Autenticacao.getUsuario();
+  }
   runApp(const MainApp());
 }
 
@@ -33,6 +36,13 @@ class MainApp extends StatelessWidget {
       theme: Tema.padrao,
       initialRoute: rotaInicial,
       routes: Rotas.rotas,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+      ],
     );
   }
 }

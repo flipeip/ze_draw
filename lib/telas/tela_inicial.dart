@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ze_draw/telas/evento/tela_evento.dart';
 import '../api/autenticacao.dart';
 import 'feed/feed_inicial.dart';
 import 'perfil/perfil_tela.dart';
@@ -17,7 +18,7 @@ class _TelaInicialState extends State<TelaInicial> {
 
   List<Widget> _buildScreens() {
     return [
-      const FeedTela(),
+      const EventoTela(),
       const FeedTela(),
       const FeedTela(),
       const FeedTela(),

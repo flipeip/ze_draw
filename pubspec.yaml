@@ -20,10 +20,13 @@ dependencies:
   carousel_slider: ^4.2.1
   gradient_borders: ^1.0.0
   flutter_datetime_picker: ^1.5.1
-  intl: ^0.18.1
+  intl: ^0.18.0
   popover: ^0.2.8+2
   cached_network_image: ^3.2.3
   persistent_bottom_nav_bar: ^5.0.2
+  dots_indicator: ^2.0.0
+  flutter_localizations:
+    sdk: flutter
   
 dev_dependencies:
   flutter_test:
@@ -34,3 +37,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+  fonts:
+    - family: LeckerliOne
+      fonts:
+        - asset: assets/fonts/LeckerliOne-Regular.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-VariableFont_slnt,wght.ttf

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -9,17 +10,16 @@ import 'package:uuid/uuid.dart';
 import 'package:ze_draw/api/post/api_arq_post.dart';
 import 'package:ze_draw/widgets/app_bar_default.dart';
 
-
 import '../../api/api.dart';
 import '../../api/api_perfil.dart';
 import '../../api/autenticacao.dart';
 import '../../models/post/arquivos_postagem.dart';
+import '../../models/post/conquista.dart';
 import '../../models/usuario.dart';
 import '../feed/post_aberto.dart';
 
 class PerfilTela extends StatefulWidget {
   final int? usuario;
-
   const PerfilTela({Key? key, required this.usuario}): super(key: key);
 
   @override
@@ -131,38 +131,125 @@ class _PerfilTela extends State<PerfilTela>{
                           FutureBuilder<List<Usuario>>(
                             future: lerPerfil.getFas(widget.usuario!),
                             builder: (context, snapshot) {
-                              final fas = snapshot.data ?? [];
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: fas.map(
-                                  (fa) => FutureBuilder<String>(
-                                    future: lerPerfil.getUsuarioBucketUrl('${fa.foto}'),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
-                                      } else if (snapshot.hasError) {
-                                        return Text('${snapshot.error}');
-                                      } else if (snapshot.hasData) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(left:8.0),
-                                        child: CircleAvatar(
-                                          maxRadius: 28,
-                                          child: ClipRRect(
-                                            borderRadius: const BorderRadius.all(Radius.circular(50)),
-                                            child: Image.network(snapshot.data!),
-                                          )
-                                          ),
-                                      );
-                                      } else {
-                                        return const Padding(
-                                          padding: EdgeInsets.symmetric(horizontal:12.0),
-                                          child: Text('Você ainda não possui fãs :( Publique suas artes e interaja para conseguir novos fãs!', style: TextStyle(color: Colors.grey),),
-                                        );
+                              if (snapshot.hasData && snapshot.data!.isNotEmpty){
+                                final fas = snapshot.data ?? [];
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: fas.map(
+                                    (fa) => FutureBuilder<String>(
+                                      future: lerPerfil.getUsuarioBucketUrl('${fa.foto}'),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          return Text('${snapshot.error}');
+                                        } else if (snapshot.hasData) {
+                                          final foto = snapshot.data!;
+                                          return FutureBuilder<int>(
+                                            future: lerPerfil.getUsuarioId(fa.userId),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting){
+                                                return const CircularProgressIndicator();
+                                              }else{
+                                                final usuarioId = snapshot.data!;
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(left:8.0),
+                                                  child: GestureDetector(
+                                                    onTap: (){
+                                                      PersistentNavBarNavigator.pushNewScreen(
+                                                          context,
+                                                          screen: PerfilTela(usuario: usuarioId),
+                                                          withNavBar: true,
+                                                          pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                                                      );
+                                                    },
+                                                    child: CircleAvatar(
+                                                      maxRadius: 28,
+                                                      child: ClipRRect(
+                                                        borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                                        child: Image.network(foto),
+                                                      )
+                                                      ),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          );
+                                        } else {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                            child: Text(Autenticacao.usuario == widget.usuario ? 'Você ainda não possui fãs :( Publique suas artes e interaja para conseguir novos fãs!': 'Este usuário não possui fãs.', style: TextStyle(color: Colors.grey),),
+                                          );
+                                        }
                                       }
-                                    }
-                                  )
-                                ).toList(),
-                              );
+                                    )
+                                  ).toList(),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                  child: Text(Autenticacao.usuario == widget.usuario ? 'Você ainda não possui fãs :( Publique suas artes e interaja para conseguir novos fãs!': 'Este usuário não possui fãs.', style: TextStyle(color: Colors.grey),),
+                                );
+                              }
+                            }
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Icon(FontAwesomeIcons.medal, color: Colors.black, size: 12),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8.0),
+                                    child: Text('Conquistas', textAlign: TextAlign.left),
+                                  ),
+                                ],
+                              )
+                            ),
+                          ),
+                          FutureBuilder<List<Conquista>>(
+                            future: lerPerfil.getConquistas(widget.usuario!),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data!.isNotEmpty){
+                                final conquistas = snapshot.data ?? [];
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: conquistas.map(
+                                    (conquista) => FutureBuilder<String>(
+                                      future: lerPerfil.getConquistaBucketUrl(conquista.icon),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          return Text('${snapshot.error}');
+                                        } else if (snapshot.hasData) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(left:8.0),
+                                            child: CircleAvatar(
+                                              maxRadius: 28,
+                                              child: ClipRRect(
+                                                borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                                child: Image.network(snapshot.data!),
+                                              )
+                                              ),
+                                          );
+                                        } else {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                            child: Text(Autenticacao.usuario == widget.usuario ? 'Você ainda não possui conquistas :( Participe de eventos, interaja com outros artistas e busque novos conhecimentos!' : 'Este usuário não possui conquistas', style: TextStyle(color: Colors.grey),),
+                                          );
+                                        }
+                                      }
+                                    )
+                                  ).toList(),
+                                );
+                              }else{
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                  child: Text(Autenticacao.usuario == widget.usuario ? 'Você ainda não possui conquistas :( Participe de eventos, interaja com outros artistas e busque novos conhecimentos!' : 'Este usuário não possui conquistas', style: TextStyle(color: Colors.grey),),
+                                );
+                              }
                             }
                           ),
                           const Padding(
@@ -183,50 +270,57 @@ class _PerfilTela extends State<PerfilTela>{
                           FutureBuilder<List<Arquivo>>(
                             future: lerPerfil.getArquivosPostsUsuario(widget.usuario!),
                             builder: (context, snapshot) {
-                              final arquivos = snapshot.data ?? [];
-                              return Wrap(
-                                direction: Axis.horizontal,
-                                alignment: WrapAlignment.start,
-                                children: arquivos
-                                .map(
-                                  (arquivo) => FutureBuilder<String>(
-                                    future: lerArquivos.getArquivoBucketUrl('${arquivo.postagem}/${arquivo.arquivo}'),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const CircularProgressIndicator();
-                                      } else if (snapshot.hasError) {
-                                        return Text('${snapshot.error}');
-                                      } else if (snapshot.hasData) {
-                                        final imageUrl = snapshot.data!;
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal:8.0, vertical: 8),
-                                          child: 
-                                          GestureDetector(
-                                            onTap: (){
-                                              PersistentNavBarNavigator.pushNewScreen(
-                                                  context,
-                                                  screen: PostAbertoTela(post: arquivo.postagem),
-                                                  withNavBar: true,
-                                                  pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                                              );
-                                            },
-                                            child: SizedBox(
-                                              height: MediaQuery.sizeOf(context).width * 0.27,
-                                              width: MediaQuery.sizeOf(context).width * 0.27,
-                                              child: ClipRRect(
-                                                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                                                child: Image.network(imageUrl, fit: BoxFit.cover),
+                              if (snapshot.hasData && snapshot.data!.isNotEmpty){
+                                final arquivos = snapshot.data ?? [];
+                                return Wrap(
+                                  direction: Axis.horizontal,
+                                  alignment: WrapAlignment.start,
+                                  children: arquivos
+                                  .map(
+                                    (arquivo) => FutureBuilder<String>(
+                                      future: lerArquivos.getArquivoBucketUrl('${arquivo.postagem}/${arquivo.arquivo}'),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return const CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          return Text('${snapshot.error}');
+                                        } else if (snapshot.hasData) {
+                                          final imageUrl = snapshot.data!;
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal:8.0, vertical: 8),
+                                            child: 
+                                            GestureDetector(
+                                              onTap: (){
+                                                PersistentNavBarNavigator.pushNewScreen(
+                                                    context,
+                                                    screen: PostAbertoTela(post: arquivo.postagem),
+                                                    withNavBar: true,
+                                                    pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                                                );
+                                              },
+                                              child: SizedBox(
+                                                height: MediaQuery.sizeOf(context).width * 0.27,
+                                                width: MediaQuery.sizeOf(context).width * 0.27,
+                                                child: ClipRRect(
+                                                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                                  child: Image.network(imageUrl, fit: BoxFit.cover),
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        );
-                                      } else {
-                                        return const Text('Imagem indisponível');
-                                      }
-                                    },
-                                  ),
-                                ).toList(),
-                              );
+                                            )
+                                          );
+                                        } else {
+                                          return const Text('Imagem indisponível');
+                                        }
+                                      },
+                                    ),
+                                  ).toList(),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal:12.0),
+                                  child: Text(Autenticacao.usuario == widget.usuario ? 'Você ainda não possui nenhuma arte publicada :(' : 'Este usuário não possui artes publicadas', style: TextStyle(color: Colors.grey),),
+                                );
+                              }
                             }
                           ),
                         ],),
@@ -246,7 +340,6 @@ class _PerfilTela extends State<PerfilTela>{
 class CapaWidget extends StatefulWidget{
   final Usuario perfil;
   final int usuarioPerfil;
-
   const CapaWidget({super.key, required this.perfil, required this.usuarioPerfil});
 
   @override
@@ -256,8 +349,6 @@ class CapaWidget extends StatefulWidget{
     ApiPerfil lerPerfil = ApiPerfil();
 
     File? imagemSelecionada;
-
-    bool _isBadgeTapped = true;
 
     @override
     Widget build(BuildContext context) {
@@ -276,36 +367,33 @@ class CapaWidget extends StatefulWidget{
             ),
           );
           } else if (snapshot.hasData && widget.perfil.capa != null) {
-            if (widget.usuarioPerfil == Autenticacao.usuario as int){
-              return GestureDetector(
-              onTap: () {
-                if (_isBadgeTapped) {
-                  _atualizarCapa();
-                }
-              },
-              child: Badge(
-                largeSize: 25,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                label: const Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12,),
-                backgroundColor: Colors.black26,
-                alignment: const Alignment(0.85, 0.9),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isBadgeTapped = true;
-                    });
-                  },
-                  child:SizedBox(
-                      height: 120,
-                      width: MediaQuery.of(context).size.width,
-                      child: ClipRRect(
-                        child: Image.network(snapshot.data!, fit: BoxFit.cover),
-                      ),
+            if (widget.usuarioPerfil == Autenticacao.usuario){
+              return Stack(
+                children: [
+                  SizedBox(
+                    height: 120,
+                    width: MediaQuery.of(context).size.width,
+                    child: ClipRRect(
+                      child: Image.network(snapshot.data!, fit: BoxFit.cover),
+                    ),
                   ),
-                ),
-              ),
-            );
-            }else{
+                  Positioned(
+                    bottom: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () => _atualizarCapa(),
+                      child: Container(
+                        decoration: const BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.all(Radius.circular(15))),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                          child: Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12),
+                        ),
+                      ),
+                    )
+                  )
+                ] 
+              );
+            } else{
               return SizedBox(
                   height: 120,
                   width: MediaQuery.of(context).size.width,
@@ -315,25 +403,9 @@ class CapaWidget extends StatefulWidget{
               );
             }
           } else {
-            return GestureDetector(
-              onTap: () {
-                if (_isBadgeTapped) {
-                  _atualizarCapa();
-                }
-              },
-              child: Badge(
-                largeSize: 25,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                label: const Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12,),
-                backgroundColor: Colors.black26,
-                alignment: const Alignment(0.85, 0.9),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isBadgeTapped = true;
-                    });
-                  },
-                  child:Container(
+            return Stack(
+                children: [
+                  Container(
                     height: 120,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
@@ -343,9 +415,22 @@ class CapaWidget extends StatefulWidget{
                         )
                       ),
                   ),
-                ),
-              ),
-            );
+                  Positioned(
+                    bottom: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () => _atualizarCapa(),
+                      child: Container(
+                        decoration: const BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.all(Radius.circular(15))),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                          child: Icon(FontAwesomeIcons.camera, color: Colors.white, size: 12),
+                        ),
+                      ),
+                    )
+                  )
+                ] 
+              );
           }
       }));
     }
@@ -373,11 +458,9 @@ class CapaWidget extends StatefulWidget{
       var uuid = const Uuid();
       final newUuid = uuid.v4();
       api.storage.from("capa_usuario").upload(newUuid+path.extension(imagemSelecionada!.path), imagemSelecionada!);
-
       lerPerfil.updateCapa(widget.usuarioPerfil, newUuid+path.extension(imagemSelecionada!.path));
-
       setState(() {
-        lerPerfil.getUsuarioCapaBucketUrl(newUuid+path.extension(imagemSelecionada!.path));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Capa atualizada com sucesso!", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
       });
     }
 }

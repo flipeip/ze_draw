@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:uuid/uuid.dart';
@@ -12,14 +13,18 @@ import 'package:uuid/uuid.dart';
 import '../../api/api.dart';
 import '../../api/autenticacao.dart';
 import '../../api/post/api_arq_post.dart';
+import '../../api/post/api_evento.dart';
 import '../../api/post/api_post.dart';
 import '../../models/models.dart';
+import '../../models/post/usuario_conquista.dart';
 import '../../widgets/botao_default.dart';
 import '../tela_inicial.dart';
 import 'novo_post_controlador.dart';
 
 class NovoPostTela extends StatefulWidget {
-  const NovoPostTela({Key? key}): super(key: key);
+  final int? evento;
+
+  const NovoPostTela({Key? key, this.evento}): super(key: key);
 
   @override
   State<NovoPostTela> createState() => _NovoPostTela();
@@ -209,9 +214,18 @@ class _NovoPostTela extends State<NovoPostTela>{
   Future _createData() async {
     int? usuario = Autenticacao.usuario;
 
-    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuarioId: usuario!);
-  
+    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuarioId: usuario!, evento: widget.evento);
     List<dynamic> res = await criarPost.createData(postagem);
+    
+    if(widget.evento != null){
+      ApiEvento lerEvento = ApiEvento();
+      late final int? conquistaId;
+      List<dynamic> response = await lerEvento.readEvento(widget.evento!);
+      conquistaId = response[0]['conquista'];
+
+      UsuarioConquista conquista = UsuarioConquista(usuarioId: usuario, conquistaId: conquistaId!);
+      await criarPost.novaConquista(conquista);
+    }
 
     for(var file in imagensSelecionadas) {
       var uuid = const Uuid();
@@ -230,12 +244,10 @@ class _NovoPostTela extends State<NovoPostTela>{
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Arte publicada! :)", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
 
     PersistentNavBarNavigator.pushNewScreen(
-        context,
-        screen: TelaInicial(),
-        withNavBar: false,
-        pageTransitionAnimation: PageTransitionAnimation.cupertino,
+      context,
+      screen: const TelaInicial(),
+      withNavBar: true,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );
-
   }
-  
 }

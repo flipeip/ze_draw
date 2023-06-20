@@ -1,4 +1,5 @@
 import '../../models/models.dart';
+import '../models/post/conquista.dart';
 import '../models/usuarios_fa.dart';
 import 'api.dart';
 
@@ -34,6 +35,12 @@ class ApiPerfil {
     return res;
   }
 
+  Future<int> getUsuarioId(String userId) async {
+    List<dynamic> res = await api.from('usuario')
+        .select().eq('user_id', userId);
+    return res[0]['id'] as int;
+  }
+
   Future<bool> isFa(int usuarioId, int? faId) async {
     List<dynamic> res = await api.from('usuarios_fa').select().eq('usuario_id', usuarioId).eq('fa_id', faId);
     return res.isNotEmpty;
@@ -47,9 +54,22 @@ class ApiPerfil {
     return (usuariosFas).map((e) => Usuario.fromMap(e)).toList();
   }
 
+  Future<List<Conquista>> getConquistas(int usuarioId) async {
+    List<dynamic> res = await api.from('usuario_conquista').select().eq('usuario_id', usuarioId);
+    final conquistas = res.map((item) => item['conquista_id']);
+
+    List<dynamic> usuarioConquistas = await api.from('conquista').select().in_('id', conquistas.toList());
+    return (usuarioConquistas).map((e) => Conquista.fromMap(e)).toList();
+  }
+
   Future<String> getUsuarioBucketUrl(String arquivo) async {
     final usuarioBucket = api.storage.from('fotos_usuario').getPublicUrl(arquivo);
     return usuarioBucket;
+  }
+
+  Future<String> getConquistaBucketUrl(String icon) async {
+    final conquistasBucket = api.storage.from('icon_conquista').getPublicUrl(icon);
+    return conquistasBucket;
   }
 
   Future<String> getUsuarioCapaBucketUrl(String arquivo) async {

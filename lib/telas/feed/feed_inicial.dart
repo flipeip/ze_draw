@@ -1,5 +1,6 @@
 // ignore_for_file: sort_child_properties_last
-
+import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
@@ -28,6 +29,20 @@ class FeedTela extends StatelessWidget {
       return (response).map((e) => Postagem.fromMap(e)).toList();
     }
 
+    late final int? eventoId;
+    void getUltimoEvento() async {
+      List<dynamic> response = await lerPost.getUltimoEvento();
+      eventoId = response[0]['id'];
+    }
+    getUltimoEvento();
+
+    String getNomeMes(String dataString) {
+      DateFormat dateFormat = DateFormat.MMMM('pt_BR');
+      DateTime data = DateTime.parse(dataString);
+      String nomeMes = dateFormat.format(data);
+      return nomeMes.substring(0, 1).toUpperCase() + nomeMes.substring(1);
+    }
+
     return Scaffold(
       appBar: const AppBarDefault(),
       body: FutureBuilder(
@@ -36,18 +51,145 @@ class FeedTela extends StatelessWidget {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()));
           } else if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: (snapshot.data!).length,
-              itemBuilder: ((BuildContext context, int index) {
-              Postagem postagem = (snapshot.data!)[index];
-              return PostagemWidget(postagem: postagem);
-              }
-            ));
+            return Column(
+              children: [
+                FutureBuilder(
+                  future: lerPost.getUltimoEvento(),
+                  builder: ((context, snapshot) {
+                    if (snapshot.hasError) {
+                      return SizedBox(height: 120, child: Center(child: Text(snapshot.error.toString())));
+                    } else if (snapshot.hasData) {
+                      final evento = snapshot.data![0];
+                      return Container(
+                        decoration: BoxDecoration(
+                          color:const Color(0XFFD9B438),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 12,
+                              offset: const Offset(0, 2), // Define o deslocamento para baixo
+                            ),
+                          ],
+                        ),
+                        width: MediaQuery.sizeOf(context).width,
+                        height: 130,
+                        child: ClipRRect(
+                          child: Row(
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 130,
+                                    width: 160,
+                                    child: FutureBuilder<String>(
+                                      future: lerPost.getEventoBucketUrl('${evento['capa']}'),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting){
+                                          return const Center(child: CircularProgressIndicator());
+                                        }else if(snapshot.hasData){
+                                          return FittedBox(
+                                            fit: BoxFit.cover,
+                                            alignment: Alignment.topCenter,
+                                            child: Image.network(snapshot.data!),
+                                          );
+                                        }else{
+                                          return Container();
+                                        }
+                                      }
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 15,
+                                    child: Container(
+                                      width: 160,
+                                      decoration: const BoxDecoration(color: Color.fromARGB(115, 105, 42, 35)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.only(right: 8.0),
+                                              child: Icon(FontAwesomeIcons.clock, color: Colors.white),
+                                            ),
+                                            Text("${evento['data_inicio'].substring(evento['data_inicio'].length - 2)} - ${evento['data_termino'].substring(evento['data_termino'].length - 2)}  ${getNomeMes(evento['data_termino'])}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),),
+                                          ],
+                                        ),
+                                      )
+                                    ),
+                                    )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text('Evento da Semana', style: TextStyle(fontSize: 12, color: Color(0xFF5E4D26))),
+                                    Transform.translate(
+                                      offset: const Offset(0, -8),
+                                      child: ShaderMask(
+                                        shaderCallback: (Rect bounds) {
+                                          return const LinearGradient(
+                                            colors: [Color(0xFF692A23), Color(0xFFA16D2E), Color(0xFF5E4D26)],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ).createShader(bounds);
+                                        },
+                                        child: Text(evento['tema'], style: const TextStyle(fontFamily: 'LeckerliOne', fontSize: 34.5, color: Color(0xFFA16D2E)),
+                                        ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: (){
+                                        PersistentNavBarNavigator.pushNewScreen(
+                                            context,
+                                            screen: NovoPostTela(evento: eventoId),
+                                            withNavBar: false,
+                                            pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                                        );
+                                      },
+                                      child: 
+                                        Container(
+                                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12) ,gradient: LinearGradient(colors: [Color(0xFF5E4D26), Color(0XFF5D733C)])),
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 26.0, vertical: 8.0),
+                                            child: Text('Publicar no Evento', style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w400),),
+                                          ),
+                                        )
+                                    )
+                                  ],
+                                ),
+                              )
+                            ]
+                          ,),
+                        )
+                      );
+                    }
+                    return Container();
+                  }),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: (snapshot.data!).length,
+                    itemBuilder: ((BuildContext context, int index) {
+                    Postagem postagem = (snapshot.data!)[index];
+                    return PostagemWidget(postagem: postagem);
+                    }
+                  )),
+                ),
+              ],
+            );
           }
           return const Center(child: CircularProgressIndicator(color: Color(0xFF679C8A),));
         }),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'novoPost',
         onPressed: (){
           PersistentNavBarNavigator.pushNewScreen(
               context,
@@ -124,60 +266,70 @@ class _PostagemWidgetState extends State<PostagemWidget> {
             } else {
               final usuario = snapshot.data;
               return Row(
-              children: [
-                FutureBuilder<String>(
-                  future: lerPerfil.getUsuarioBucketUrl('${usuario?[0].foto}'),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container(
-                        width: 42,
-                        height: 42,
-                        child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 197, 197, 197),
-                          borderRadius: BorderRadius.all(Radius.circular(50))
-                        ),
-                      );
-                    } else if (snapshot.hasData && usuario?[0].foto != null) {
-                      final imageUrl = snapshot.data!;
-                      return GestureDetector(
-                        onTap: (){
-                           PersistentNavBarNavigator.pushNewScreen(
-                              context,
-                              screen: PerfilTela(usuario: widget.postagem.usuarioId),
-                              withNavBar: true,
-                              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-                          );
-                        },
-                        child: CircleAvatar(
-                          backgroundImage: Image.network(imageUrl).image,
-                        ),
-                      );
-                    } else {
-                      return Container(
-                        width: 42,
-                        height: 42,
-                        child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 197, 197, 197),
-                          borderRadius: BorderRadius.all(Radius.circular(50))
-                        ),
-                      );
-                    }
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      usuario?[0].nome != null 
-                      ? Text(usuario?[0].nome as String, style: const TextStyle(fontWeight: FontWeight.w600),)
-                      : const Text('...'),
-                      Text(formatoHora(dataAtual.difference(DateTime.parse(widget.postagem.dataPublicacao))), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200),),
-                    ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                Row(
+                  children: [
+                    FutureBuilder<String>(
+                    future: lerPerfil.getUsuarioBucketUrl('${usuario?[0].foto}'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container(
+                          width: 42,
+                          height: 42,
+                          child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 197, 197, 197),
+                            borderRadius: BorderRadius.all(Radius.circular(50))
+                          ),
+                        );
+                      } else if (snapshot.hasData && usuario?[0].foto != null) {
+                        final imageUrl = snapshot.data!;
+                        return GestureDetector(
+                          onTap: (){
+                            PersistentNavBarNavigator.pushNewScreen(
+                                context,
+                                screen: PerfilTela(usuario: widget.postagem.usuarioId),
+                                withNavBar: true,
+                                pageTransitionAnimation: PageTransitionAnimation.cupertino,
+                            );
+                          },
+                          child: CircleAvatar(
+                            backgroundImage: Image.network(imageUrl).image,
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          width: 42,
+                          height: 42,
+                          child: const Icon(FontAwesomeIcons.userLarge, color: Colors.white, size: 20),
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 197, 197, 197),
+                            borderRadius: BorderRadius.all(Radius.circular(50))
+                          ),
+                        );
+                      }
+                    },
                   ),
-                )
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        usuario?[0].nome != null 
+                        ? Text(usuario?[0].nome as String, style: const TextStyle(fontWeight: FontWeight.w600),)
+                        : const Text('...'),
+                        Text(formatoHora(dataAtual.difference(DateTime.parse(widget.postagem.dataPublicacao))), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200),),
+                      ],
+                    ),
+                  )],
+                ),
+                widget.postagem.evento != null ?
+                  SvgPicture.asset(
+                    'assets/images/event-calendar.svg',
+                    height: 30,
+                  )
+                : Container()
               ],
             );
             }}
@@ -230,6 +382,7 @@ class _PostagemWidgetState extends State<PostagemWidget> {
                                   );
                                 },
                                 child: Stack(
+                                  alignment: Alignment.center,
                                   children: [
                                     SizedBox(
                                       height: 300,
