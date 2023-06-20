@@ -27,13 +27,6 @@ class PerfilTela extends StatefulWidget {
 class _PerfilTela extends State<PerfilTela>{
   ApiPerfil lerPerfil = ApiPerfil();
   ApiArquivoPost lerArquivos = ApiArquivoPost();
-  late Future<List<Usuario>> usuarioPerfilFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    usuarioPerfilFuture = readData();
-  }
 
   Future<List<Usuario>> readData() async {
     List<dynamic> response = await lerPerfil.getUsuario(widget.usuario!);
@@ -46,7 +39,7 @@ class _PerfilTela extends State<PerfilTela>{
       appBar: const AppBarDefault(),
       body: SingleChildScrollView(
         child: FutureBuilder(
-          future: usuarioPerfilFuture,
+          future: readData(),
           builder: ((context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return SizedBox(
@@ -64,12 +57,7 @@ class _PerfilTela extends State<PerfilTela>{
                 Usuario perfil = snapshot.data![0];
                 return Column(
                   children: [
-                    CapaWidget(perfil: perfil, usuarioPerfil: widget.usuario!,
-                    recarregarCapa: () {
-                      setState(() {
-                        usuarioPerfilFuture = readData();
-                      });
-                    }),
+                    CapaWidget(perfil: perfil, usuarioPerfil: widget.usuario!),
                     Transform.translate(
                       offset: const Offset(0, -54),
                       child: Padding(
@@ -257,8 +245,7 @@ class _PerfilTela extends State<PerfilTela>{
 class CapaWidget extends StatefulWidget{
   final Usuario perfil;
   final int usuarioPerfil;
-  final Function recarregarCapa;
-  const CapaWidget({super.key, required this.perfil, required this.usuarioPerfil, required this.recarregarCapa});
+  const CapaWidget({super.key, required this.perfil, required this.usuarioPerfil});
 
   @override
     State<CapaWidget> createState() => _CapaWidgetState();
@@ -358,12 +345,9 @@ class CapaWidget extends StatefulWidget{
       var uuid = const Uuid();
       final newUuid = uuid.v4();
       api.storage.from("capa_usuario").upload(newUuid+path.extension(imagemSelecionada!.path), imagemSelecionada!);
-
       lerPerfil.updateCapa(widget.usuarioPerfil, newUuid+path.extension(imagemSelecionada!.path));
-
       setState(() {
-        lerPerfil.getUsuarioCapaBucketUrl(newUuid+path.extension(imagemSelecionada!.path));
-        widget.recarregarCapa();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Capa atualizada com sucesso!", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
       });
     }
 }

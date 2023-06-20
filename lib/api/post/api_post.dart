@@ -9,7 +9,13 @@ class ApiPost {
   
   Future<List<dynamic>> readData() async {
     List<dynamic> res = await api.from('postagem')
-        .select('id, titulo, descricao, usuario_id, data_publicacao').order('data_publicacao', ascending: false);
+        .select('id, titulo, descricao, usuario_id, data_publicacao, evento').order('data_publicacao', ascending: false);
+    return res;
+  }
+
+  Future<List<dynamic>> readDataEvento() async {
+    List<dynamic> res = await api.from('postagem')
+        .select().not('evento', 'is', null).order('data_publicacao', ascending: false);
     return res;
   }
 
@@ -17,6 +23,17 @@ class ApiPost {
     List<dynamic> res = await api.from('postagem')
         .select('id, titulo, descricao, usuario_id, data_publicacao').eq('id', postagem).order('data_publicacao', ascending: false);
     return res;
+  }
+
+  Future<dynamic> getUltimoEvento() async {
+    List<dynamic> res = await api.from('evento')
+        .select().order('data_termino', ascending: false).limit(1);
+    return res;
+  }
+
+  Future<String> getEventoBucketUrl(String eventoId) async {
+    final eventoBucket = api.storage.from('capa_evento').getPublicUrl(eventoId);
+    return eventoBucket;
   }
 
   Future<List<Usuario>> getUsuarioPostagem(int? usuarioId) async {

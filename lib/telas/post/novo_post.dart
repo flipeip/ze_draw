@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:uuid/uuid.dart';
+import 'package:ze_draw/telas/evento/tela_evento.dart';
 
 import '../../api/api.dart';
 import '../../api/autenticacao.dart';
@@ -20,7 +21,9 @@ import '../tela_inicial.dart';
 import 'novo_post_controlador.dart';
 
 class NovoPostTela extends StatefulWidget {
-  const NovoPostTela({Key? key}): super(key: key);
+  final int? evento;
+
+  const NovoPostTela({Key? key, this.evento}): super(key: key);
 
   @override
   State<NovoPostTela> createState() => _NovoPostTela();
@@ -209,8 +212,7 @@ class _NovoPostTela extends State<NovoPostTela>{
 
   Future _createData() async {
     int? usuario = Autenticacao.usuario;
-
-    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuarioId: usuario!);
+    PostagemCreate postagem = PostagemCreate(titulo: controlador.titulo.text, descricao: controlador.descricao.text, usuarioId: usuario!, evento: widget.evento);
   
     List<dynamic> res = await criarPost.createData(postagem);
 
@@ -230,12 +232,22 @@ class _NovoPostTela extends State<NovoPostTela>{
 
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Arte publicada! :)", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
 
-    PersistentNavBarNavigator.pushNewScreen(
+    if (widget.evento != null){
+      PersistentNavBarNavigator.pushNewScreen(
+        context,
+        screen: const EventoTela(),
+        withNavBar: true,
+        pageTransitionAnimation: PageTransitionAnimation.cupertino,
+      );
+    }else{
+      PersistentNavBarNavigator.pushNewScreen(
         context,
         screen: const TelaInicial(),
         withNavBar: false,
         pageTransitionAnimation: PageTransitionAnimation.cupertino,
-    );
+      );
+    }
+    
 
   }
   

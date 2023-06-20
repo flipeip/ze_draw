@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ze_draw/telas/perfil/perfil_novo.dart';
 import 'package:ze_draw/telas/tela_inicial.dart';
 import 'cadastro/cadastro_controlador.dart';
+import 'evento/tela_evento.dart';
 import 'feed/arquivo_aberto.dart';
 import 'feed/feed_inicial.dart';
 import 'feed/post_aberto.dart';
@@ -14,9 +15,10 @@ class Rotas {
   static const cadastro = '/cadastro';
   static const telaIncial = '/';
   static const feed = '/feed';
+  static const evento = '/evento';
   static const postAberto = '/post';
   static const arquivoAberto = '/arquivos';
-  static const novoPost = '/novo_post';
+  static const novoPost = '/novo_post/:evento?';
   static const novoPerfil = '/novo_perfil';
   static const perfil = '/perfil';
 
@@ -24,6 +26,7 @@ class Rotas {
     return {
       login: (_) => LoginControlador(),
       feed: (_) => const FeedTela(),
+      evento: (_) => const EventoTela(),
       postAberto: (BuildContext context) {
         final post = ModalRoute.of(context)?.settings.arguments as int;
         return PostAbertoTela(post: post);
@@ -34,7 +37,7 @@ class Rotas {
       },
       telaIncial: (_) => const TelaInicial(),
       cadastro: (_) => CadastroControlador(),
-      novoPost: (_) => const NovoPostTela(),
+      novoPost: (context, {int? eventoId}) => NovoPostTela(evento: eventoId),
       novoPerfil: (_) => const NovoPerfilTela(),
       perfil: (BuildContext context) {
         final usuario = ModalRoute.of(context)?.settings.arguments as int;

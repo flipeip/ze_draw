@@ -7,12 +7,14 @@ class Postagem {
   final String descricao;
   late final int usuarioId;
   final String dataPublicacao;
+  final int? evento;
   Postagem({
     this.id,
     required this.titulo,
     required this.descricao,
     required this.usuarioId,
     required this.dataPublicacao,
+    this.evento,
   });
 
   Postagem copyWith({
@@ -21,6 +23,7 @@ class Postagem {
     String? descricao,
     int? usuarioId,
     String? dataPublicacao,
+    int? evento,
   }) {
     return Postagem(
       id: id ?? this.id,
@@ -28,6 +31,7 @@ class Postagem {
       descricao: descricao ?? this.descricao,
       usuarioId: usuarioId ?? this.usuarioId,
       dataPublicacao: dataPublicacao ?? this.dataPublicacao,
+      evento: evento ?? this.evento,
     );
   }
 
@@ -36,8 +40,9 @@ class Postagem {
       'id': id,
       'titulo': titulo,
       'descricao': descricao,
-      'usuario_id': usuarioId,
+      'usuario_d': usuarioId,
       'data_publicacao': dataPublicacao,
+      'evento': evento,
     };
   }
 
@@ -48,6 +53,7 @@ class Postagem {
       descricao: map['descricao'] as String,
       usuarioId: map['usuario_id'] as int,
       dataPublicacao: map['data_publicacao'] as String,
+      evento: map['evento'] != null ? map['evento'] as int : null,
     );
   }
 
@@ -57,7 +63,7 @@ class Postagem {
 
   @override
   String toString() {
-    return 'Postagem(id: $id, titulo: $titulo, descricao: $descricao, usuario_id: $usuarioId, data_publicacao: $dataPublicacao)';
+    return 'Postagem(id: $id, titulo: $titulo, descricao: $descricao, usuario_id: $usuarioId, data_publicacao: $dataPublicacao, evento: $evento)';
   }
 
   @override
@@ -69,7 +75,8 @@ class Postagem {
       other.titulo == titulo &&
       other.descricao == descricao &&
       other.usuarioId == usuarioId &&
-      other.dataPublicacao == dataPublicacao;
+      other.dataPublicacao == dataPublicacao &&
+      other.evento == evento;
   }
 
   @override
@@ -78,6 +85,7 @@ class Postagem {
       titulo.hashCode ^
       descricao.hashCode ^
       usuarioId.hashCode ^
-      dataPublicacao.hashCode;
+      dataPublicacao.hashCode ^
+      evento.hashCode;
   }
 }
